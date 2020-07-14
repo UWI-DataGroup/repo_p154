@@ -30,7 +30,15 @@
 ** 24-JUN-2020
 ** We might in time bring this over to P154 to separate the algorithm developments 
 ** IMPORT the data from P151 --> The covid surveillance folder 
-do "`logpath151'\covidprofiles_003_metrics_v5"
+** do "`logpath151'\covidprofiles_003_metrics_v5"
+
+** 12-JUL-2020
+** Partial separation of p151 and p154
+** p151 --> C:\Sync\OneDrive - The University of the West Indies\repo_datagroup\repo_p151\covidprofiles_003_metrics_v5.do
+** Saves dataset to p154 
+local c_date = c(current_date)
+local date_string = subinstr("`c_date'", " ", "", .)
+use "`datapath'\version01\2-working\covid_daily_surveillance_`date_string'", clear 
 
 ** We have data on 20 CARICOM countries for the length of the COVID outbreak
 ** We want to do the following
@@ -112,7 +120,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
 save "`datapath'/version01\2-working/ct_history", replace 
 
 
-/*
+
 
 ** GRAPHICS FOR FIRST FIGURE
 ** To DATE --> CT needs across the 20 CARICOM countries
