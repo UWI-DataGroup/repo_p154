@@ -224,17 +224,17 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 days if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 days if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -243,30 +243,42 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             bgcolor(white) 
             ysize(5) xsize(14)
             
-            xlab(
-            , labs(6) nogrid glc(gs16) angle(0) format(%9.0f))
-            xtitle("Days since first case", size(6) margin(l=2 r=2 t=2 b=2)) 
+            xlab(   
+                    22006 "1 Apr"
+                    22036 "1 May"
+                    22067 "1 Jun"
+                    22097 "1 Jul"
+                    22128 "1 Aug"
+                    22159 "1 Sep"
+                    22189 "1 Oct"
+                    22220 "1 Nov"
+                    22250 "1 Dec"
+
+            , labs(7) nogrid glc(gs16) angle(45) format(%9.0f))
+            xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
             ylab(
-            , labs(6) notick nogrid glc(gs16) angle(0))
+            , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources required", size(6) margin(l=2 r=2 t=2 b=2)) 
-            
-            ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
-            text(24 140 "Predictions", place(se) size(6) col(gs4))
-            text(21 140 "30% without test, 0.5% of those test positive", place(se) size(5) col(gs10))
-            text(19 140 "8 contacts (blue), 12 contacts (purple)", place(se) size(5) col(gs10))
+            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
 
-            legend(off size(6) position(5) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
-                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) 
+            legend(size(8) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
+                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
+                lab(6 "$ctfut2 contacts")
+                lab(7 "$ctfut1 contacts")
+                lab(8 "Cases")
+
                 )
-                name(ct_BRB1) 
+                name(scenario1) 
                 ;
         #delimit cr
-        ** graph export "`outputpath'/04_TechDocs/ct_`country'_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario1_$S_DATE.png", replace width(3000)
       
 
 restore
+
+
+
 
 **FUTURE SCENARIO 2
 ** Then 70% arriving with negative tests
@@ -384,17 +396,17 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 days if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 days if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -404,26 +416,39 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             ysize(5) xsize(14)
             
             xlab(
-            , labs(6) nogrid glc(gs16) angle(0) format(%9.0f))
-            xtitle("Days since first case", size(6) margin(l=2 r=2 t=2 b=2)) 
+                    22006 "1 Apr"
+                    22036 "1 May"
+                    22067 "1 Jun"
+                    22097 "1 Jul"
+                    22128 "1 Aug"
+                    22159 "1 Sep"
+                    22189 "1 Oct"
+                    22220 "1 Nov"
+                    22250 "1 Dec"
+            , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
+            xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
             ylab(
-            , labs(6) notick nogrid glc(gs16) angle(0))
+            , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources required", size(6) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
             
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
             text(21 140 "30% without test, 1% of those test positive", place(se) size(5) col(gs10))
             text(19 140 "8 contacts (blue), 12 contacts (purple)", place(se) size(5) col(gs10))
 
-            legend(off size(6) position(5) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
-                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) 
+            legend(size(8) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
+                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
+                lab(6 "$ctfut2 contacts")
+                lab(7 "$ctfut1 contacts")
+                lab(8 "Cases")
+
                 )
-                name(ct_BRB2) 
+                name(scenario2) 
                 ;
         #delimit cr
-        ** graph export "`outputpath'/04_TechDocs/ct_`country'_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario2_$S_DATE.png", replace width(3000)
       
 
 restore
@@ -543,17 +568,17 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 days if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 days if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -563,26 +588,40 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             ysize(5) xsize(14)
             
             xlab(
-            , labs(6) nogrid glc(gs16) angle(0) format(%9.0f))
-            xtitle("Days since first case", size(6) margin(l=2 r=2 t=2 b=2)) 
+                    22006 "1 Apr"
+                    22036 "1 May"
+                    22067 "1 Jun"
+                    22097 "1 Jul"
+                    22128 "1 Aug"
+                    22159 "1 Sep"
+                    22189 "1 Oct"
+                    22220 "1 Nov"
+                    22250 "1 Dec"
+
+            , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
+            xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
             ylab(
-            , labs(6) notick nogrid glc(gs16) angle(0))
+            , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources required", size(6) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
             
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
             text(21 140 "50% without test, 0.5% of those test positive", place(se) size(5) col(gs10))
             text(19 140 "8 contacts (blue), 12 contacts (purple)", place(se) size(5) col(gs10))
 
-            legend(off size(6) position(5) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
-                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) 
+            legend(size(8) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
+                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
+                lab(6 "$ctfut2 contacts")
+                lab(7 "$ctfut1 contacts")
+                lab(8 "Cases")
+
                 )
-                name(ct_BRB3) 
+                name(scenario3) 
                 ;
         #delimit cr
-        ** graph export "`outputpath'/04_TechDocs/ct_`country'_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario3_$S_DATE.png", replace width(3000)
       
 restore
 
@@ -700,17 +739,17 @@ preserve
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 days if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 days if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 days if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases days if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 days if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 days if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -720,29 +759,84 @@ preserve
             ysize(5) xsize(14)
             
             xlab(
-            , labs(6) nogrid glc(gs16) angle(0) format(%9.0f))
-            xtitle("Days since first case", size(6) margin(l=2 r=2 t=2 b=2)) 
+                    22006 "1 Apr"
+                    22036 "1 May"
+                    22067 "1 Jun"
+                    22097 "1 Jul"
+                    22128 "1 Aug"
+                    22159 "1 Sep"
+                    22189 "1 Oct"
+                    22220 "1 Nov"
+                    22250 "1 Dec"
+
+            , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
+            xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
             ylab(
-            , labs(6) notick nogrid glc(gs16) angle(0))
+            , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources required", size(6) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
             
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
             text(21 140 "50% without test, 1% of those test positive", place(se) size(5) col(gs10))
             text(19 140 "5 contacts (blue), 10 contacts (purple)", place(se) size(5) col(gs10))
 
-            legend(off size(6) position(5) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
-                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) 
+            legend(size(8) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
+                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
+                lab(6 "$ctfut2 contacts")
+                lab(7 "$ctfut1 contacts")
+                lab(8 "Cases")
+
                 )
-                name(ct_BRB4) 
+                name(scenario4) 
                 ;
         #delimit cr
-        ** graph export "`outputpath'/04_TechDocs/ct_`country'_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario4_$S_DATE.png", replace width(3000)
     restore
+
 ****Suggested for title of panel of graphs
 ****Estimations of Contact Tracing Workforce as SARS-COV2 prevalence and PCR status changes 
 
 ***The absolute difference (a simple substraction) may actualy be the most appropriate measure
 ***Since we are trying to inform resource development/estimation.
+
+
+
+** ------------------------------------------------------
+** PDF REGIONAL REPORT (COUNTS OF CONFIRMED CASES)
+** ------------------------------------------------------
+    putpdf begin, pagesize(letter) font("Calibri Light", 10) margin(top,0.5cm) margin(bottom,0.25cm) margin(left,0.5cm) margin(right,0.25cm)
+
+** EXTRA SLIDE - ALL CT CURVES ON ONE SLIDES
+    putpdf table intro2 = (1,1), width(100%) halign(left)    
+    putpdf table intro2(.,.), border(all, nil) valign(center)
+    putpdf table intro2(1,.), font("Calibri Light", 12, 000000)  
+    putpdf table intro2(1,1)=("Figure: "), bold halign(left)
+    putpdf table intro2(1,1)=("Estimations of Contact Tracing Workforce Needs, given 4 possible scenarios for SARS-COV2 prevalence ") , halign(left) append 
+    putpdf table intro2(1,1)=("and PCR status (positive/negative) as of $S_DATE. "), halign(left) append   
+
+** FIGURE 
+    putpdf table f2 = (8,1), width(70%) border(all,nil) halign(center)
+    putpdf table f2(1,1)=("Scenario 1. 30% without test, 0.5% of those test positive"), halign(left) font("Calibri Light", 12, 0e497c)  
+    putpdf table f2(2,1)=image("`outputpath'/04_TechDocs/scenario1_$S_DATE.png")
+    putpdf table f2(3,1)=("Scenario 2. 30% without test, 1% of those test positive"), halign(left) font("Calibri Light", 12, 0e497c)  
+    putpdf table f2(4,1)=image("`outputpath'/04_TechDocs/scenario2_$S_DATE.png")
+    putpdf table f2(5,1)=("Scenario 3. 50% without test, 0.5% of those test positive"), halign(left) font("Calibri Light", 12, 0e497c)  
+    putpdf table f2(6,1)=image("`outputpath'/04_TechDocs/scenario3_$S_DATE.png")
+    putpdf table f2(7,1)=("Scenario 4. 50% without test, 1% of those test positive"), halign(left) font("Calibri Light", 12, 0e497c)  
+    putpdf table f2(8,1)=image("`outputpath'/04_TechDocs/scenario4_$S_DATE.png")
+
+** Footnote.
+    **putpdf paragraph ,  font("Calibri Light", 9)
+    **putpdf text ("Methodological Note 1. ") , bold
+    **putpdf text ("Each graphic presents the daily demand for contact tracers given the confirmed COVID-19 caseload. The demand assumes that contact tracers can ")
+    **putpdf text ("conduct 6 confirmed case interviews, 12 potential case notifications, and 32 potential case follow-ups. Case follow-up is required for up to ") 
+    **putpdf text ("14 days after identification. ")
+    **putpdf text ("Methodological Note 2. ") , bold
+    **putpdf text ("Blue bars assume 10 contacts per confirmed case. Purple bars assume 15 contacts per confirmed case. Dotted lines are smoothed daily contact tracer demand. ")
+
+** Save the PDF
+    local c_date = c(current_date)
+    local date_string = subinstr("`c_date'", " ", "", .)
+    putpdf save "`outputpath'/05_Outputs/brb_scenarios_`date_string'", replace
