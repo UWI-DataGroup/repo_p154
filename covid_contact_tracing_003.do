@@ -741,4 +741,8 @@ preserve
         #delimit cr
         ** graph export "`outputpath'/04_TechDocs/ct_`country'_$S_DATE.png", replace width(3000)
     restore
+****Suggested for title of panel of graphs
+****Estimations of Contact Tracing Workforce as SARS-COV2 prevalence and PCR status changes 
 
+***The absolute difference (a simple substraction) may actualy be the most appropriate measure
+***Since we are trying to inform resource development/estimation.
