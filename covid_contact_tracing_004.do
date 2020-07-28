@@ -454,8 +454,8 @@ gen darr_notest = darr_red * 0.5
 ** 0.5% without a test will be positive
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d($S_DATE)
-gen darr_pos = ceil(darr_notest * 0.01) if random>=0.5
-replace darr_pos = floor(darr_notest * 0.01) if random<0.5
+gen darr_pos = ceil(darr_notest * 0.02) if random>=0.5
+replace darr_pos = floor(darr_notest * 0.02) if random<0.5
 drop random 
 
 ** Now calculaate the same NUMBERS as for historical data 
