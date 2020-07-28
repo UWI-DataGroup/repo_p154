@@ -632,11 +632,11 @@ restore
 * Arriving with no test (50%) 
 gen darr_notest = darr_red * 0.5 
 
-** 0.5% without a test will be positive
+** 2% without a test will be positive
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d($S_DATE)
-gen darr_pos = ceil(darr_notest * 0.01) if random>=0.5
-replace darr_pos = floor(darr_notest * 0.01) if random<0.5
+gen darr_pos = ceil(darr_notest * 0.02) if random>=0.5
+replace darr_pos = floor(darr_notest * 0.02) if random<0.5
 drop random 
 
 ** Now calculaate the same NUMBERS as for historical data 
@@ -779,7 +779,7 @@ preserve
             
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
-            text(21 140 "50% without test, 1% of those test positive", place(se) size(5) col(gs10))
+            text(21 140 "50% without test, 2% of those test positive", place(se) size(5) col(gs10))
             text(19 140 "5 contacts (blue), 10 contacts (purple)", place(se) size(5) col(gs10))
 
             legend(off size(8) position(11) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
