@@ -31,7 +31,7 @@
 ** BARBADOS AS EXAMPLE 
 ** COMMON TO ALL SCENARIOS
 ** 75% reduction in tourism arrivals per country 
-** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
+** we estimate 5 to 10 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
 ** TEMP tourism data for Barbados
 input year month days arrivals
