@@ -105,6 +105,9 @@ gen darr_red = darr * 0.25 if date>=d($S_DATE) & date<=d(30sep2020)
 replace darr_red = darr * 0.25 if date>=d(01oct2020) & date<=d(30nov2020)
 replace darr_red = darr * 0.25 if date>=d(01dec2020) & date<=d(31dec2020)
 
+***Calculating numbers of high risk cases arrivals assuming 20%
+**This contributes to cases that need mandatory following
+gen darr_hr = darr_red*0.2 
 
 ** FUTURE SCENARIO 1
 
@@ -124,7 +127,7 @@ gen darr_pos = ceil(darr_notest * 0.005) if random>=0.5
 replace darr_pos = floor(darr_notest * 0.005) if random<0.5
 drop random 
 
-** Now calculaate the same NUMBERS as for historical data 
+** Now calculate the same NUMBERS as for historical data 
 replace new_cases = darr_pos if date>=d($S_DATE) & date<=d(30dec2020)
 drop maxel days runid ccase ccase_lag14 case14 cts_* ctsa_* ctsb_*
 replace darr_red = 0 if darr_red==.
@@ -203,9 +206,13 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+
+
 ** Total CT staffing needed per week 
-gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totala = cts_int + cts_nota + cts_fupa 
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
@@ -468,7 +475,7 @@ gen darr_pos = ceil(darr_notest * 0.005) if random>=0.5
 replace darr_pos = floor(darr_notest * 0.005) if random<0.5
 drop random 
 
-** Now calculaate the same NUMBERS as for historical data 
+** Now calculate the same NUMBERS as for historical data 
 replace new_cases = darr_pos if date>=d($S_DATE) & date<=d(30dec2020)
 drop maxel days runid ccase ccase_lag14 case14 cts_* ctsa_* ctsb_*
 replace darr_red = 0 if darr_red==.
@@ -547,9 +554,13 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+**Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhra = darr_hr/($ctfup) if date >= d($S_DATE)
+
+
 ** Total CT staffing needed per week 
-gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totala = cts_int + cts_nota + cts_fupa 
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhra
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
