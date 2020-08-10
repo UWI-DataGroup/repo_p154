@@ -209,7 +209,7 @@ replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
-
+replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
@@ -218,7 +218,6 @@ gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
 by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
-
 
 
 
@@ -284,7 +283,6 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
       
 
 restore
-
 
 
 
@@ -384,9 +382,13 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+replace cts_fuhrb = 0 if cts_fuhrb == .
+
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
@@ -555,13 +557,14 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
-**Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhra = darr_hr/($ctfup) if date >= d($S_DATE)
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+replace cts_fuhrb = 0 if cts_fuhrb == .
 
 
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
-gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhra
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
@@ -621,7 +624,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
             text(21 140 "50% without test, 0.5% of those test positive", place(se) size(5) col(gs10))
-            text(19 140 "8 contacts (blue), 12 contacts (purple)", place(se) size(5) col(gs10))
+            text(19 140 "5 contacts (blue), 10 contacts (purple)", place(se) size(5) col(gs10))
 
             legend(off size(8) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
@@ -730,9 +733,13 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+replace cts_fuhrb = 0 if cts_fuhrb == .
+
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
@@ -821,7 +828,7 @@ preserve
     putpdf table intro2 = (1,1), width(100%) halign(left)    
     putpdf table intro2(.,.), border(all, nil) valign(center)
     putpdf table intro2(1,.), font("Calibri Light", 12, 000000)  
-    putpdf table intro2(1,1)=("Figure: "), bold halign(left)
+    putpdf table intro2(1,1)=("Figure 1: "), bold halign(left)
     putpdf table intro2(1,1)=("Estimations of Contact Tracing Workforce Needs, given 4 possible scenarios for SARS-COV2 prevalence ") , halign(left) append 
     putpdf table intro2(1,1)=("and PCR status (positive/negative) as of $S_DATE. "), halign(left) append   
 

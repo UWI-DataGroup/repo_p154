@@ -213,6 +213,7 @@ replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
@@ -327,6 +328,7 @@ replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
@@ -439,6 +441,7 @@ replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
@@ -552,6 +555,7 @@ replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
