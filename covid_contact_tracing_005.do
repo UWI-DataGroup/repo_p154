@@ -105,6 +105,11 @@ gen darr_red = darr * 0.25 if date>=d($S_DATE) & date<=d(30sep2020)
 replace darr_red = darr * 0.25 if date>=d(01oct2020) & date<=d(30nov2020)
 replace darr_red = darr * 0.25 if date>=d(01dec2020) & date<=d(31dec2020)
 
+***Calculating numbers of high risk cases arrivals assuming 20%
+**This contributes to cases that need mandatory following
+gen darr_hr = darr_red*0.2 
+
+
 ** Save scenario dataset
 tempfile scenario scenario1 scenario2 scenario3 scenario4
 save `scenario', replace 
@@ -178,7 +183,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -207,9 +212,12 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario1a)
@@ -289,7 +297,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -318,9 +326,12 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario2a)
@@ -398,7 +409,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -427,9 +438,12 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario3a)
@@ -508,7 +522,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -537,9 +551,12 @@ gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
 
+***Running total of CT-staff for mandatory quarantine follow-up
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa
-gen cts_totalb = cts_int + cts_notb + cts_fupb
+gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario4a)

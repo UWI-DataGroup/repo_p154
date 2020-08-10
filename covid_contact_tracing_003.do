@@ -118,7 +118,8 @@ gen darr_hr = darr_red*0.2
 
 preserve
 ** Arriving with no test (30%) 
-gen darr_notest = darr_red * 0.3 
+gen darr_notest = darr_red * 0.3
+
 
 ** 0.5% without a test will be positive
 ** With RANDOM round-down or round-up to nearest integer 
@@ -177,7 +178,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -269,7 +270,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
 
-            legend(size(9) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
+            legend(size(5) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
                 lab(6 "$ctfut2 contacts")
                 lab(7 "$ctfut1 contacts")
@@ -354,7 +355,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -525,7 +526,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -700,7 +701,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel
+keep country country_order iso iso_num pop date new_cases days maxel darr_hr
 bysort iso : gen runid = _n 
 gen ccase = 0
 
