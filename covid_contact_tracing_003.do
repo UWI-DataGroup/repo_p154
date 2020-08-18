@@ -30,7 +30,7 @@
 
 ** BARBADOS AS EXAMPLE 
 ** COMMON TO ALL SCENARIOS
-** 75% reduction in tourism arrivals per country 
+** 59% reduction in tourism arrivals per country 
 ** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
 ** TEMP tourism data for Barbados
@@ -101,9 +101,13 @@ replace darr = 0 if darr==.
 
 ** Reduction of 75% arrivals in Aug and Sep
 ** And reduction of 75% in Oct & Nov 
-gen darr_red = darr * 0.25 if date>=d($S_DATE) & date<=d(30sep2020)
-replace darr_red = darr * 0.25 if date>=d(01oct2020) & date<=d(30nov2020)
-replace darr_red = darr * 0.25 if date>=d(01dec2020) & date<=d(31dec2020)
+gen darr_red = darr * 0.41 if date>=d($S_DATE) & date<=d(30sep2020)
+replace darr_red = darr * 0.41 if date>=d(01oct2020) & date<=d(30nov2020)
+replace darr_red = darr * 0.41 if date>=d(01dec2020) & date<=d(31dec2020)
+
+***A Macro to separate time to August 1 and after August 5
+global S1_DATE = "01aug2020"
+global S2_DATE = "05aug2020"
 
 ***Calculating numbers of high risk cases arrivals assuming 20%
 **This contributes to cases that need mandatory following
@@ -114,7 +118,7 @@ gen darr_hr = darr_red*0.2
 ** Then 70% arriving with negative tests
 ** Of the 30% without negative tests - estimating that 0.5% will test positive. 
 ** Of these 0.5% we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
-** we estimate 5 to 10 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
+** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
 preserve
 ** Arriving with no test (30%) 
@@ -148,10 +152,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -196,19 +200,19 @@ gen case14 = ccase - ccase_lag14
 gen cts_int = new_cases / ($ctint)
 
 ** Running total of CT-staff for contact notification 
-gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S_DATE)
-gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S_DATE)
-replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S_DATE)
-replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S_DATE)
+gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
+gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
 
 ** Running total of CT-staff for contact follow-up  
-gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S_DATE)
-gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
-replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
-replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
+gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
 replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
@@ -231,17 +235,17 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S1_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S1_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S1_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S1_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S1_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(5aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(5aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(5aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(5aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(5aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -264,7 +268,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(
+            ylab(0(10)80  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -284,7 +288,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
 
 restore
 
-
+/*
 
 **FUTURE SCENARIO 2
 ** Then 70% arriving with negative tests
@@ -323,10 +327,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -371,19 +375,19 @@ gen case14 = ccase - ccase_lag14
 gen cts_int = new_cases / ($ctint)
 
 ** Running total of CT-staff for contact notification 
-gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S_DATE)
-gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S_DATE)
-replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S_DATE)
-replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S_DATE)
+gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
+gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
 
 ** Running total of CT-staff for contact follow-up  
-gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S_DATE)
-gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
-replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
-replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
+gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
 replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
@@ -406,17 +410,17 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S1_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S1_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S1_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S1_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S1_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(5aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(5aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(5aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(5aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(5aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -438,7 +442,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(
+            ylab(0(10)80
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -498,10 +502,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -546,19 +550,19 @@ gen case14 = ccase - ccase_lag14
 gen cts_int = new_cases / ($ctint)
 
 ** Running total of CT-staff for contact notification 
-gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S_DATE)
-gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S_DATE)
-replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S_DATE)
-replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S_DATE)
+gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
+gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
 
 ** Running total of CT-staff for contact follow-up  
-gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S_DATE)
-gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
-replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
-replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
+gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
 replace cts_fuhrb = 0 if cts_fuhrb == .
 
 
@@ -583,17 +587,17 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S1_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S1_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S1_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S1_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S1_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(5aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(5aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(5aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(5aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(5aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -616,7 +620,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(
+            ylab(0(10)80
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -624,7 +628,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
             text(21 140 "50% without test, 0.5% of those test positive", place(se) size(5) col(gs10))
-            text(19 140 "5 contacts (blue), 10 contacts (purple)", place(se) size(5) col(gs10))
+            text(19 140 "8 contacts (blue), 12 contacts (purple)", place(se) size(5) col(gs10))
 
             legend(off size(8) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
@@ -674,10 +678,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -722,19 +726,19 @@ gen case14 = ccase - ccase_lag14
 gen cts_int = new_cases / ($ctint)
 
 ** Running total of CT-staff for contact notification 
-gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S_DATE)
-gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S_DATE)
-replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S_DATE)
-replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S_DATE)
+gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
+gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
 
 ** Running total of CT-staff for contact follow-up  
-gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S_DATE)
-gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S_DATE)
-replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S_DATE)
-replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S_DATE)
+gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S_DATE)
+gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
 replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
@@ -758,17 +762,17 @@ preserve
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date<d($S_DATE), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date<d($S_DATE), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date<d($S_DATE), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date<d($S_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date<d($S_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date<d($S1_DATE), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date<d($S1_DATE), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date<d($S1_DATE), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date<d($S1_DATE), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date<d($S1_DATE), lc("55 74 131%50") lw(0.4) lp("-"))
 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(1aug2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(1aug2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(1aug2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(1aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(1aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(5aug2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(5aug2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(5aug2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(5aug2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(5aug2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -791,7 +795,7 @@ preserve
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(
+            ylab(0(10)80
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -799,7 +803,7 @@ preserve
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
             text(21 140 "50% without test, 2% of those test positive", place(se) size(5) col(gs10))
-            text(19 140 "5 contacts (blue), 10 contacts (purple)", place(se) size(5) col(gs10))
+            text(19 140 "8 contacts (blue), 12 contacts (purple)", place(se) size(5) col(gs10))
 
             legend(off size(8) position(11) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)

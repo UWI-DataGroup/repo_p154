@@ -30,8 +30,8 @@
 
 ** BARBADOS AS EXAMPLE 
 ** COMMON TO ALL SCENARIOS
-** 75% reduction in tourism arrivals per country 
-** we estimate 5 to 10 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
+** 59% reduction in tourism arrivals per country 
+** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
 ** TEMP tourism data for Barbados
 input year month days arrivals
@@ -101,9 +101,9 @@ replace darr = 0 if darr==.
 
 ** Reduction of 75% arrivals in Aug and Sep
 ** And reduction of 75% in Oct, Nov, Dec 
-gen darr_red = darr * 0.25 if date>=d($S_DATE) & date<=d(30sep2020)
-replace darr_red = darr * 0.25 if date>=d(01oct2020) & date<=d(30nov2020)
-replace darr_red = darr * 0.25 if date>=d(01dec2020) & date<=d(31dec2020)
+gen darr_red = darr * 0.41 if date>=d($S_DATE) & date<=d(30sep2020)
+replace darr_red = darr * 0.41 if date>=d(01oct2020) & date<=d(30nov2020)
+replace darr_red = darr * 0.41 if date>=d(01dec2020) & date<=d(31dec2020)
 
 ***Calculating numbers of high risk cases arrivals assuming 20%
 **This contributes to cases that need mandatory following
@@ -152,10 +152,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -267,10 +267,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -380,10 +380,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -494,10 +494,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 5
-global ctnew2 = 10
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
