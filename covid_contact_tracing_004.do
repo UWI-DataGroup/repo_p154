@@ -596,8 +596,8 @@ rename scenario3b b3
 rename scenario4a a4
 rename scenario4b b4
 reshape long a b, i(month) j(scenario)
-rename a c5
-rename b c10 
+rename a c8
+rename b c12 
 reshape long c, i(month scenario) j(contacts)
 
 ** THE SCENARIOS

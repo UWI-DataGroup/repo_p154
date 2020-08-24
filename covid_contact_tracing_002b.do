@@ -138,10 +138,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 10
-global ctnew2 = 15
-global ctfut1 = 5 
-global ctfut2 = 10 
+global ctnew1 = 8
+global ctnew2 = 12
+global ctfut1 = 8 
+global ctfut2 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 6
@@ -249,7 +249,7 @@ preserve
             ///title("(1) Cumulative cases in `country'", pos(11) ring(1) size(4))
             text(24 140 "Predictions", place(se) size(6) col(gs4))
             text(21 140 "10% without test, 2% of those test positive", place(se) size(5) col(gs10))
-            text(19 140 "5 contacts (blue), 10 contacts (purple)", place(se) size(5) col(gs10))
+            text(19 140 "8 contacts (blue), 12 contacts (purple)", place(se) size(5) col(gs10))
 
             legend(off size(6) position(5) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) 

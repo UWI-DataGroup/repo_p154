@@ -288,7 +288,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
 
 restore
 
-/*
+
 
 **FUTURE SCENARIO 2
 ** Then 70% arriving with negative tests
