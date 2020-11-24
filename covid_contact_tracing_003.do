@@ -268,7 +268,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(10)80  
+            ylab(0(10)70  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -283,7 +283,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
                 name(scenario1) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario1_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario1_$S_DATE.png", replace width(5000)
       
 
 restore
@@ -442,7 +442,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(10)80
+            ylab(0(10)70
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -462,7 +462,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
                 name(scenario2) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario2_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario2_$S_DATE.png", replace width(5000)
       
 
 restore
@@ -620,7 +620,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(10)80
+            ylab(0(10)70
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -640,7 +640,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
                 name(scenario3) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario3_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario3_$S_DATE.png", replace width(5000)
       
 restore
 
@@ -795,7 +795,7 @@ preserve
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(10)80
+            ylab(0(10)70
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -815,7 +815,7 @@ preserve
                 name(scenario4) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario4_$S_DATE.png", replace width(3000)
+        graph export "`outputpath'/04_TechDocs/scenario4_$S_DATE.png", replace width(5000)
     restore
 
 
@@ -829,12 +829,12 @@ preserve
     putpdf begin, pagesize(letter) font("Calibri Light", 10) margin(top,0.5cm) margin(bottom,0.25cm) margin(left,0.5cm) margin(right,0.25cm)
 
 ** EXTRA SLIDE - ALL CT CURVES ON ONE SLIDES
-    putpdf table intro2 = (1,1), width(100%) halign(left)    
-    putpdf table intro2(.,.), border(all, nil) valign(center)
-    putpdf table intro2(1,.), font("Calibri Light", 12, 000000)  
-    putpdf table intro2(1,1)=("Figure 1: "), bold halign(left)
-    putpdf table intro2(1,1)=("Estimations of Contact Tracing Workforce Needs, given 4 possible scenarios for SARS-COV2 prevalence ") , halign(left) append 
-    putpdf table intro2(1,1)=("and PCR status (positive/negative) as of $S_DATE. "), halign(left) append   
+    **putpdf table intro2 = (1,1), width(100%) halign(left)    
+    **putpdf table intro2(.,.), border(all, nil) valign(center)
+    **putpdf table intro2(1,.), font("Calibri Light", 12, 000000)  
+    **putpdf table intro2(1,1)=("Figure 1: "), bold halign(left)
+    **putpdf table intro2(1,1)=("Estimations of Contact Tracing Workforce Needs, given 4 possible scenarios for SARS-COV2 prevalence ") , halign(left) append 
+    **putpdf table intro2(1,1)=("and PCR status (positive/negative)"), halign(left) append   
 
 ** FIGURE 
     putpdf table f2 = (8,1), width(70%) border(all,nil) halign(center)
