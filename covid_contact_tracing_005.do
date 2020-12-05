@@ -381,10 +381,10 @@ replace pop = 287371 if pop==.
 global ctmin = 15 
 
 ** Contacts per new positive case
-global ctnew1 = 8
-global ctnew2 = 12
-global ctfut1 = 10 
-global ctfut2 = 14 
+global ctnew1 = 10
+global ctnew2 = 14
+global ctfut1 = 12 
+global ctfut2 = 16 
 
 ** Daily case load: Positive case interviews
 global ctint = 4

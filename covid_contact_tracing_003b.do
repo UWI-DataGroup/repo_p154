@@ -1,9 +1,8 @@
  **HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name				  covid_contact_tracing_002a.do
+    //  algorithm name				  covid_contact_tracing_003b.do
     //  project:				        
     //  analysts:				  	  Ian HAMBLETON
-    // 	date last modified	          27-July-2020
     //  algorithm task			      Run DO file batch
 
     ** General algorithm set-up
@@ -24,7 +23,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\covid_contact_tracing_003", replace
+    log using "`logpath'\covid_contact_tracing_003b", replace
 ** HEADER -----------------------------------------------------
 
 
@@ -264,10 +263,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(20)160  
+            ylab(0(20)120  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
 
             legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
@@ -295,11 +294,11 @@ preserve
 gen darr_notest = darr_red * 0.05
 
 
-** 1% without a test will be positive and 1% of all arrivals will be positive
+** 0.75% without a test will be positive and 75% of all arrivals will be positive
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.01) + (darr * 0.01))  if random>=0.5
-replace darr_pos = floor((darr_notest * 0.01) + (darr * 0.01)) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.0075) + (darr * 0.0075))  if random>=0.5
+replace darr_pos = floor((darr_notest * 0.0075) + (darr * 0.0075)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -432,7 +431,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             ylab(0(20)160  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
 
             legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
@@ -461,11 +460,11 @@ preserve
 gen darr_notest = darr_red * 0.05
 
 
-** 0.5% without a test will be positive, plus 0.05% of ALL ARRIVALS
+** 0.00025% without a test will be positive, plus 0.00025% of ALL ARRIVALS
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.0005) + (darr * 0.0005)) if random>=0.5
-replace darr_pos = floor((darr_notest * 0.0005) + (darr * 0.0005)) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.00025) + (darr * 0.00025)) if random>=0.5
+replace darr_pos = floor((darr_notest * 0.00025) + (darr * 0.00025)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -596,10 +595,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(20)160  
+            ylab(0(5)15  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
 
             legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
@@ -616,7 +615,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
 restore
 
 
-/** ------------------------------------------------------
+** ------------------------------------------------------
 ** PDF REGIONAL REPORT (COUNTS OF CONFIRMED CASES)
 ** ------------------------------------------------------
     putpdf begin, pagesize(letter) font("Calibri Light", 10) margin(top,0.5cm) margin(bottom,0.25cm) margin(left,0.5cm) margin(right,0.25cm)
@@ -633,12 +632,12 @@ restore
     putpdf table f2 = (8,1), width(70%) border(all,nil) halign(center)
     putpdf table f2(1,1)=("Scenario 1. 5% without test, 0.5% of those test positive on first test and 0.5% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
     putpdf table f2(2,1)=image("`outputpath'/04_TechDocs/scenario1_$S_DATE.png")
-    putpdf table f2(3,1)=("Scenario 2. 5% without test, 1% of those test positive on first test and 1% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
-    putpdf table f2(4,1)=image("`outputpath'/04_TechDocs/scenario2_$S_DATE.png")
-    putpdf table f2(5,1)=("Scenario 3. 1% without test, 0.5% of those test positive on first test and 0.5% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
-    putpdf table f2(6,1)=image("`outputpath'/04_TechDocs/scenario3_$S_DATE.png")
-    putpdf table f2(7,1)=("Scenario 4. 1% without test, 1% of those test positive on first test and 1% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
-    putpdf table f2(8,1)=image("`outputpath'/04_TechDocs/scenario4_$S_DATE.png")
+    putpdf table f2(4,1)=("Scenario 2. 5% without test, 1% of those test positive on first test and 1% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
+    putpdf table f2(5,1)=image("`outputpath'/04_TechDocs/scenario2_$S_DATE.png")
+    putpdf table f2(7,1)=("Scenario 3. 5% without test, 0.025% of those test positive on first test and 0.025% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
+    putpdf table f2(8,1)=image("`outputpath'/04_TechDocs/scenario3_$S_DATE.png")
+    **putpdf table f2(7,1)=("Scenario 4. 1% without test, 1% of those test positive on first test and 1% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
+    **putpdf table f2(8,1)=image("`outputpath'/04_TechDocs/scenario4_$S_DATE.png")
 
 ** Footnote.
     **putpdf paragraph ,  font("Calibri Light", 9)

@@ -1,6 +1,6 @@
  **HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name				  covid_contact_tracing_004b.do
+    //  algorithm name				  covid_contact_tracing_005b.do
     //  project:				        
     //  analysts:				  	  Ian HAMBLETON
     //  algorithm task			      Run DO file batch
@@ -23,7 +23,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\covid_contact_tracing_004b", replace
+    log using "`logpath'\covid_contact_tracing_005b", replace
 ** HEADER -----------------------------------------------------
 
 ** BARBADOS AS EXAMPLE 
@@ -169,7 +169,7 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+global ctfup = 40
 
 ** Contact supervision
 global ctsup = 10
@@ -472,7 +472,7 @@ merge 1:1 date using `scenario3'
 drop _merge 
 save `scencomb', replace
 
-/** TABLE
+** TABLE
 ***The absolute difference (a simple substraction) may actualy be the most appropriate measure
 ***Since we are trying to inform resource development/estimation.
 
