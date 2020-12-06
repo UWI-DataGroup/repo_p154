@@ -275,8 +275,8 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
 
             legend(size(5) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
-                lab(6 "$ctfut2 contacts")
-                lab(7 "$ctfut1 contacts")
+                lab(6 "10 contacts")
+                lab(7 "14 contacts")
                 lab(8 "Cases")
 
                 )
