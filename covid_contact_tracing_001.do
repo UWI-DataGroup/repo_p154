@@ -55,10 +55,10 @@ global ctmin = 15
 
 ** Contacts per new positive case
 global ctnew1 = 10
-global ctnew2 = 15
+global ctnew2 = 14
 
 ** Daily case load: Positive case interviews
-global ctint = 6
+global ctint = 4
 
 ** Daily case load: Contact notification
 global ctnot = 12
@@ -189,7 +189,7 @@ foreach country of local clist {
 
 ** FIGURE 
     putpdf table f2 = (14,3), width(100%) border(all,nil) halign(center)
-    putpdf table f2(1,1)=("Angilla"), halign(left) font("Calibri Light", 12, 0e497c)  
+    putpdf table f2(1,1)=("Anguilla"), halign(left) font("Calibri Light", 12, 0e497c)  
     putpdf table f2(2,1)=image("`outputpath'/04_TechDocs/ct_AIA_$S_DATE.png")
     putpdf table f2(1,2)=("Antigua and Barbuda"), halign(left) font("Calibri Light", 12, 0e497c)  
     putpdf table f2(2,2)=image("`outputpath'/04_TechDocs/ct_ATG_$S_DATE.png")
@@ -243,7 +243,7 @@ foreach country of local clist {
     putpdf text ("conduct 6 confirmed case interviews, 12 potential case notifications, and 32 potential case follow-ups. Case follow-up is required for up to ") 
     putpdf text ("14 days after identification. ")
     putpdf text ("Methodological Note 2. ") , bold
-    putpdf text ("Blue bars assume 10 contacts per confirmed case. Purple bars assume 15 contacts per confirmed case. Dotted lines are smoothed daily contact tracer demand. ")
+    putpdf text ("Blue bars assume 10 contacts per confirmed case. Purple bars assume 14 contacts per confirmed case. Dotted lines are smoothed daily contact tracer demand. ")
 
 
 ** Save the PDF
