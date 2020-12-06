@@ -159,8 +159,10 @@ global ctmin = 15
 ** Contacts per new positive case CHANGE AS NEEDED
 global ctnew1 = 10
 global ctnew2 = 14
+global ctnew3 = 12
 global ctfut1 = 10
 global ctfut2 = 14 
+global ctfut3 = 12
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -169,7 +171,9 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+*global ctfup = 30
+global ctfup = 40
+
 
 ** Contact supervision
 global ctsup = 10
@@ -207,14 +211,21 @@ gen cts_int = new_cases / ($ctint)
 ** Running total of CT-staff for contact notification 
 gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
 gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+gen cts_notc = (new_cases * $ctnew3) / ($ctnot) if date < d($S1_DATE)
 replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
 replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notc = (new_cases * $ctfut3) / ($ctnot) if date >= d($S2_DATE)
+
 
 ** Running total of CT-staff for contact follow-up  
 gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
 gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupc = (case14 * $ctnew3) / ($ctfup) if date < d($S1_DATE)
+
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupc = (case14 * $ctfut3) / ($ctfup) if date >= d($S2_DATE)
+
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
@@ -223,13 +234,17 @@ replace cts_fuhrb = 0 if cts_fuhrb == .
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
+gen cts_totalc = cts_int + cts_notc + cts_fupc 
+
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario1a)
 by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario1b)
+by iso : asrol cts_totalc , stat(mean) window(date 5) gen(scenario1c)
 
-keep date days new_cases scenario1a scenario1b 
-order date days scenario1a scenario1b new_cases 
+
+keep date days scenario1a scenario1b scenario1c
+order date days scenario1a scenario1b scenario1c 
 save `scenario1', replace 
 
 
@@ -275,8 +290,10 @@ global ctmin = 15
 ** Contacts per new positive case
 global ctnew1 = 10
 global ctnew2 = 14
+global ctnew3 = 12
 global ctfut1 = 10
 global ctfut2 = 14 
+global ctfut3 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -285,7 +302,9 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+*global ctfup = 30
+global ctfup = 40
+
 
 ** Contact supervision
 global ctsup = 10
@@ -323,14 +342,21 @@ gen cts_int = new_cases / ($ctint)
 ** Running total of CT-staff for contact notification 
 gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
 gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+gen cts_notc = (new_cases * $ctnew3) / ($ctnot) if date < d($S1_DATE)
+
 replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
 replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notc = (new_cases * $ctfut3) / ($ctnot) if date >= d($S2_DATE)
+
 
 ** Running total of CT-staff for contact follow-up  
 gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
 gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupc = (case14 * $ctnew3) / ($ctfup) if date < d($S1_DATE)
+
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupc = (case14 * $ctfut3) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
@@ -339,13 +365,16 @@ replace cts_fuhrb = 0 if cts_fuhrb == .
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
+gen cts_totalc = cts_int + cts_notc + cts_fupc
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario2a)
 by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario2b)
+by iso : asrol cts_totalc , stat(mean) window(date 5) gen(scenario2c)
 
-keep date days scenario2a scenario2b new_cases
-order date days scenario2a scenario2b new_cases
+
+keep date days scenario2a scenario2b scenario2c
+order date days scenario2a scenario2b scenario2c
 save `scenario2', replace 
 
 
@@ -390,8 +419,11 @@ global ctmin = 15
 ** Contacts per new positive case
 global ctnew1 = 10
 global ctnew2 = 14
+global ctnew3 = 12
 global ctfut1 = 10
 global ctfut2 = 14 
+global ctfut3 = 12 
+
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -400,7 +432,9 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+*global ctfup = 30
+global ctfup = 40
+
 
 ** Contact supervision
 global ctsup = 10
@@ -438,14 +472,21 @@ gen cts_int = new_cases / ($ctint)
 ** Running total of CT-staff for contact notification 
 gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
 gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+gen cts_notc = (new_cases * $ctnew3) / ($ctnot) if date < d($S1_DATE)
+
 replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
 replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notc = (new_cases * $ctfut3) / ($ctnot) if date >= d($S2_DATE)
 
 ** Running total of CT-staff for contact follow-up  
 gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
 gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupc = (case14 * $ctnew3) / ($ctfup) if date < d($S1_DATE)
+
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupc = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
@@ -454,13 +495,16 @@ replace cts_fuhrb = 0 if cts_fuhrb == .
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
+gen cts_totalc = cts_int + cts_notc + cts_fupc 
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario3a)
 by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario3b)
+by iso : asrol cts_totalc , stat(mean) window(date 5) gen(scenario3c)
 
-keep date days scenario3a scenario3b new_cases
-order date days scenario3a scenario3b new_cases
+
+keep date days scenario3a scenario3b scenario3c
+order date days scenario3a scenario3b scenario3c
 save `scenario3', replace 
 
 
@@ -472,7 +516,7 @@ merge 1:1 date using `scenario3'
 drop _merge 
 save `scencomb', replace
 
-/** TABLE
+** TABLE
 ***The absolute difference (a simple substraction) may actualy be the most appropriate measure
 ***Since we are trying to inform resource development/estimation.
 
@@ -486,7 +530,7 @@ label values tmonth tmonth
 
 
 
-collapse (mean) scenario1a scenario1b scenario2a scenario2b scenario3a scenario3b, by(tmonth)
+collapse (mean) scenario1a scenario1b scenario1c scenario2a scenario2b scenario2c scenario3a scenario3b scenario3c, by(tmonth)
 /*rename scenario1a a1
 rename scenario1b b1
 rename scenario2a a2
