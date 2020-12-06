@@ -1,9 +1,8 @@
  **HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name				  covid_contact_tracing_002a.do
+    //  algorithm name				  covid_contact_tracing_004b.do
     //  project:				        
     //  analysts:				  	  Ian HAMBLETON
-    // 	date last modified	          27-July-2020
     //  algorithm task			      Run DO file batch
 
     ** General algorithm set-up
@@ -24,9 +23,8 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\covid_contact_tracing_003", replace
+    log using "`logpath'\covid_contact_tracing_004b", replace
 ** HEADER -----------------------------------------------------
-
 
 ** BARBADOS AS EXAMPLE 
 ** COMMON TO ALL SCENARIOS
@@ -79,7 +77,7 @@ drop arrivals days
 bysort month : gen day = _n
 gen year = 2020 
 tempfile 2020
-save `2020'
+save `2020'  // creates dates for 2021
 drop if month > 6
 replace year=2021
 append using `2020'
@@ -95,16 +93,17 @@ save "`datapath'/version01\2-working/brb_arrivals", replace
 
 ** Draw historical CT data from:
 ** -covid_contact_tracing_001.do-
-use "`datapath'/version01\2-working/ct_history", clear  
+use "`datapath'/version01\2-working/covid_daily_surveillance_1Aug2020", clear  
 keep if iso=="BRB"
 
 ** APPEND FUTURE ARRIVALS (from 01-Aug2020) 
 append using "`datapath'/version01\2-working/brb_arrivals"
+sort date
 
 ** NO ARRIVALS IN COVID LOCKDOWN ERA 
 replace darr = 0 if darr==. 
 
-** Reduction of 59% arrivals from Aug 2020 
+** Reduction of 59% arrivals from Aug 2020 CHANGE AS NEEDED BASED ON ARRIVAL REDUCTIONS
 gen darr_red = darr * 0.41 if date>=d(01aug2020) 
 
 ***A Macro to separate time to August 1 and after August 5
@@ -124,25 +123,23 @@ save `scenario', replace
 ** FUTURE SCENARIO 1
 
 ** Then 95% arriving with negative tests
-** Of the 5% without negative tests - estimating that 0.5% will test positive on arrival and 0.5% retest positive (total 1%). 
-** Of these 1% we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
-** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
-
-
+** Of the 5% without negative tests - estimating that 0.5% will test positive on arrival and 0.5% of all arrivals retest positive. 
+** Of these newly arrived cases we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
+** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
+ 
 ** Arriving with no test (5%) 
-gen darr_notest = darr_red * 0.05
+gen darr_notest = darr_red * 0.05  // CHANGE AS NEEDED
 
 
-** 1% without a test will be positive
+** 0.5% without a test will be positive, plus 0.5% of ALL ARRIVALS 
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil(darr_notest * 0.01) if random>=0.5
-replace darr_pos = floor(darr_notest * 0.01) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.005) + (darr * 0.005)) if random>=0.5 // CHANGE AS NEEDED
+replace darr_pos = floor((darr_notest * 0.005) + (darr * 0.005)) if random<0.5 // CHANGE AS NEEDED 
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
-replace new_cases = darr_pos if date>=d(01aug2020) & date<=d(30jun2021)
-drop maxel days runid ccase ccase_lag14 case14 cts_* ctsa_* ctsb_*
+replace new_cases = darr_pos if date>=d(01aug2020) & date<=d(30jun2021) // UPDATE TO JUNE 2012
 replace darr_red = 0 if darr_red==.
 replace darr_notest = 0 if darr_notest==.
 replace darr_pos = 0 if darr_pos==.
@@ -159,11 +156,13 @@ replace pop = 287371 if pop==.
 ** Minimum # contact tracers per 100,000
 global ctmin = 15 
 
-** Contacts per new positive case
+** Contacts per new positive case CHANGE AS NEEDED
 global ctnew1 = 10
 global ctnew2 = 14
+global ctnew3 = 12
 global ctfut1 = 10
 global ctfut2 = 14 
+global ctfut3 = 12
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -172,7 +171,9 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+*global ctfup = 30
+global ctfup = 40
+
 
 ** Contact supervision
 global ctsup = 10
@@ -181,7 +182,7 @@ global ctsup = 10
 global wdays  = 5 
 
 ** MAX elapsed days 
-gen elapsed = _n - 1 
+replace elapsed = _n - 1 
 bysort iso : egen maxel = max(elapsed)
 
 
@@ -210,14 +211,21 @@ gen cts_int = new_cases / ($ctint)
 ** Running total of CT-staff for contact notification 
 gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
 gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+gen cts_notc = (new_cases * $ctnew3) / ($ctnot) if date < d($S1_DATE)
 replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
 replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notc = (new_cases * $ctfut3) / ($ctnot) if date >= d($S2_DATE)
+
 
 ** Running total of CT-staff for contact follow-up  
 gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
 gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupc = (case14 * $ctnew3) / ($ctfup) if date < d($S1_DATE)
+
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupc = (case14 * $ctfut3) / ($ctfup) if date >= d($S2_DATE)
+
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
@@ -226,13 +234,17 @@ replace cts_fuhrb = 0 if cts_fuhrb == .
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
+gen cts_totalc = cts_int + cts_notc + cts_fupc 
+
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario1a)
 by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario1b)
+by iso : asrol cts_totalc , stat(mean) window(date 5) gen(scenario1c)
 
-keep date days new_cases scenario1a scenario1b 
-order date days scenario1a scenario1b new_cases 
+
+keep date days scenario1a scenario1b scenario1c
+order date days scenario1a scenario1b scenario1c 
 save `scenario1', replace 
 
 
@@ -240,25 +252,25 @@ save `scenario1', replace
 ** FUTURE SCENARIO 2
 
 ** Then 95% arriving with negative tests
-** Of the 5% without negative tests - estimating that 1% will test positive on arrival and 1% retest positive (total 2%). 
-** Of these 2% we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
-** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
+** Of the 5% without negative tests - estimating that 1% will test positive on arrival, then 1% of ALL ARRIVALS retest positive. 
+** Of these newly arrived cases we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
+** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
-use `scenario', clear 
+use `scenario', replace 
+
 ** Arriving with no test (5%) 
 gen darr_notest = darr_red * 0.05
 
 
-** 2% without a test will be positive
+** 0.75% without a test will be positive and 75% of all arrivals will be positive
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil(darr_notest * 0.02) if random>=0.5
-replace darr_pos = floor(darr_notest * 0.02) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.0075) + (darr * 0.0075))  if random>=0.5
+replace darr_pos = floor((darr_notest * 0.0075) + (darr * 0.0075)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
 replace new_cases = darr_pos if date>=d(01aug2020) & date<=d(30jun2021)
-drop maxel days runid ccase ccase_lag14 case14 cts_* ctsa_* ctsb_*
 replace darr_red = 0 if darr_red==.
 replace darr_notest = 0 if darr_notest==.
 replace darr_pos = 0 if darr_pos==.
@@ -278,8 +290,10 @@ global ctmin = 15
 ** Contacts per new positive case
 global ctnew1 = 10
 global ctnew2 = 14
-global ctfut1 = 10 
+global ctnew3 = 12
+global ctfut1 = 10
 global ctfut2 = 14 
+global ctfut3 = 12 
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -288,7 +302,9 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+*global ctfup = 30
+global ctfup = 40
+
 
 ** Contact supervision
 global ctsup = 10
@@ -297,7 +313,7 @@ global ctsup = 10
 global wdays  = 5 
 
 ** MAX elapsed days 
-gen elapsed = _n - 1 
+replace elapsed = _n - 1 
 bysort iso : egen maxel = max(elapsed)
 
 
@@ -326,14 +342,21 @@ gen cts_int = new_cases / ($ctint)
 ** Running total of CT-staff for contact notification 
 gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
 gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+gen cts_notc = (new_cases * $ctnew3) / ($ctnot) if date < d($S1_DATE)
+
 replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
 replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notc = (new_cases * $ctfut3) / ($ctnot) if date >= d($S2_DATE)
+
 
 ** Running total of CT-staff for contact follow-up  
 gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
 gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupc = (case14 * $ctnew3) / ($ctfup) if date < d($S1_DATE)
+
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupc = (case14 * $ctfut3) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
@@ -342,38 +365,41 @@ replace cts_fuhrb = 0 if cts_fuhrb == .
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
+gen cts_totalc = cts_int + cts_notc + cts_fupc
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario2a)
 by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario2b)
+by iso : asrol cts_totalc , stat(mean) window(date 5) gen(scenario2c)
 
-keep date days scenario2a scenario2b new_cases
-order date days scenario2a scenario2b new_cases
+
+keep date days scenario2a scenario2b scenario2c
+order date days scenario2a scenario2b scenario2c
 save `scenario2', replace 
 
 
 ** FUTURE SCENARIO 3
 
-** Then 99% arriving with negative tests
-** Of the 1% without negative tests - estimating that 0.5% will test positive on arrival and 0.5% retest positive (total 1%). 
-** Of this 1% we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
-** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
+** Then 95% arriving with negative tests
+** Of the 5% without negative tests - estimating that 0.5% will test positive on arrival and 0.06% of all arrivals retest positive. 
+** Of these newly arrived cases we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
+** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
-use `scenario', clear 
-** Arriving with no test (1%) 
-gen darr_notest = darr_red * 0.01
+use `scenario', replace 
+
+** Arriving with no test (5%) 
+gen darr_notest = darr_red * 0.05
 
 
-** 1% without a test will be positive
+** 0.00025% without a test will be positive, plus 0.00025% of ALL ARRIVALS
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil(darr_notest * 0.01) if random>=0.5
-replace darr_pos = floor(darr_notest * 0.01) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.00025) + (darr * 0.00025)) if random>=0.5
+replace darr_pos = floor((darr_notest * 0.00025) + (darr * 0.00025)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
 replace new_cases = darr_pos if date>=d(01aug2020) & date<=d(30jun2021)
-drop maxel days runid ccase ccase_lag14 case14 cts_* ctsa_* ctsb_*
 replace darr_red = 0 if darr_red==.
 replace darr_notest = 0 if darr_notest==.
 replace darr_pos = 0 if darr_pos==.
@@ -393,8 +419,11 @@ global ctmin = 15
 ** Contacts per new positive case
 global ctnew1 = 10
 global ctnew2 = 14
+global ctnew3 = 12
 global ctfut1 = 10
 global ctfut2 = 14 
+global ctfut3 = 12 
+
 
 ** Daily case load: Positive case interviews
 global ctint = 4
@@ -403,7 +432,9 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+*global ctfup = 30
+global ctfup = 40
+
 
 ** Contact supervision
 global ctsup = 10
@@ -412,7 +443,7 @@ global ctsup = 10
 global wdays  = 5 
 
 ** MAX elapsed days 
-gen elapsed = _n - 1 
+replace elapsed = _n - 1 
 bysort iso : egen maxel = max(elapsed)
 
 
@@ -441,14 +472,21 @@ gen cts_int = new_cases / ($ctint)
 ** Running total of CT-staff for contact notification 
 gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
 gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
+gen cts_notc = (new_cases * $ctnew3) / ($ctnot) if date < d($S1_DATE)
+
 replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
 replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
+replace cts_notc = (new_cases * $ctfut3) / ($ctnot) if date >= d($S2_DATE)
 
 ** Running total of CT-staff for contact follow-up  
 gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
 gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
+gen cts_fupc = (case14 * $ctnew3) / ($ctfup) if date < d($S1_DATE)
+
 replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+replace cts_fupc = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
+
 
 ***Running total of CT-staff for mandatory quarantine follow-up
 gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
@@ -457,136 +495,24 @@ replace cts_fuhrb = 0 if cts_fuhrb == .
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
+gen cts_totalc = cts_int + cts_notc + cts_fupc 
 
 ** Smoothing: method 1
 by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario3a)
 by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario3b)
+by iso : asrol cts_totalc , stat(mean) window(date 5) gen(scenario3c)
 
-keep date days scenario3a scenario3b new_cases
-order date days scenario3a scenario3b new_cases
+
+keep date days scenario3a scenario3b scenario3c
+order date days scenario3a scenario3b scenario3c
 save `scenario3', replace 
 
-** FUTURE SCENARIO 4
 
-** Then 99% arriving with negative tests
-** Of the 1% without negative tests - estimating that 1% will test positive on arrival and 1% retest positive (total 2%). 
-** Of this 2% we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
-** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
-
-use `scenario', clear 
-
-** Arriving with no test (1%) 
-gen darr_notest = darr_red * 0.01
-
-
-** 2% without a test will be positive
-** With RANDOM round-down or round-up to nearest integer 
-gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil(darr_notest * 0.02) if random>=0.5
-replace darr_pos = floor(darr_notest * 0.02) if random<0.5
-drop random 
-
-** Now calculate the same NUMBERS as for historical data 
-replace new_cases = darr_pos if date>=d(01aug2020) & date<=d(30jun2021)
-drop maxel days runid ccase ccase_lag14 case14 cts_* ctsa_* ctsb_*
-replace darr_red = 0 if darr_red==.
-replace darr_notest = 0 if darr_notest==.
-replace darr_pos = 0 if darr_pos==.
-replace country="Barbados" if country=="" 
-replace iso="BRB" if iso=="" 
-replace country_order = 4 if country_order==. 
-replace iso_num = 4 if iso_num==. 
-replace pop = 287371 if pop==. 
-
-** Calculate contact tracing demand 
-
-** (A) ASSUMPTIONS: BASELINE VALUES
-
-** Minimum # contact tracers per 100,000
-global ctmin = 15 
-
-** Contacts per new positive case
-global ctnew1 = 10
-global ctnew2 = 14
-global ctfut1 = 10
-global ctfut2 = 14 
-
-** Daily case load: Positive case interviews
-global ctint = 4
-
-** Daily case load: Contact notification
-global ctnot = 15
-
-** Daily case load: Contact follow-up 
-global ctfup = 30
-
-** Contact supervision
-global ctsup = 10
-
-** Working days 
-global wdays  = 5 
-
-** MAX elapsed days 
-gen elapsed = _n - 1 
-bysort iso : egen maxel = max(elapsed)
-
-
-
-** (B) Calculate the CT needs based on confirmed case identification
-** keep if iso=="`country'" 
-gen days = elapsed+1 
-drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel darr_hr
-bysort iso : gen runid = _n 
-gen ccase = 0
-
-** Cumulative count of cases
-sort iso date 
-replace ccase = new_cases if runid==1
-replace ccase = ccase[_n-1] + new_cases[_n] if runid > 1   
-
-** Cumulative cases in past 14 days 
-gen ccase_lag14 = ccase[_n-14] if runid>14
-replace ccase_lag14 = 0 if ccase_lag14==. 
-gen case14 = ccase - ccase_lag14 
-
-** Running total of CT-staff for positive case interviews 
-gen cts_int = new_cases / ($ctint)
-
-** Running total of CT-staff for contact notification 
-gen cts_nota = (new_cases * $ctnew1) / ($ctnot) if date < d($S1_DATE)
-gen cts_notb = (new_cases * $ctnew2) / ($ctnot) if date < d($S1_DATE)
-replace cts_nota = (new_cases * $ctfut1) / ($ctnot) if date >= d($S2_DATE)
-replace cts_notb = (new_cases * $ctfut2) / ($ctnot) if date >= d($S2_DATE)
-
-** Running total of CT-staff for contact follow-up  
-gen cts_fupa = (case14 * $ctnew1) / ($ctfup) if date < d($S1_DATE)
-gen cts_fupb = (case14 * $ctnew2) / ($ctfup) if date < d($S1_DATE)
-replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
-replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
-
-***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
-replace cts_fuhrb = 0 if cts_fuhrb == .
-
-** Total CT staffing needed per week 
-gen cts_totala = cts_int + cts_nota + cts_fupa 
-gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
-
-** Smoothing: method 1
-by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario4a)
-by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario4b)
-
-keep date days scenario4a scenario4b new_cases
-order date days scenario4a scenario4b new_cases
-save `scenario4', replace 
 
 use `scenario1', clear 
 merge 1:1 date using `scenario2'
 drop _merge 
 merge 1:1 date using `scenario3'
-drop _merge 
-merge 1:1 date using `scenario4'
 drop _merge 
 save `scencomb', replace
 
@@ -604,8 +530,8 @@ label values tmonth tmonth
 
 
 
-collapse (mean) scenario1a scenario1b scenario2a scenario2b scenario3a scenario3b scenario4a scenario4b , by(tmonth)
-rename scenario1a a1
+collapse (mean) scenario1a scenario1b scenario1c scenario2a scenario2b scenario2c scenario3a scenario3b scenario3c, by(tmonth)
+/*rename scenario1a a1
 rename scenario1b b1
 rename scenario2a a2
 rename scenario2b b2
@@ -622,16 +548,10 @@ reshape long c, i(tmonth scenario) j(contacts)
 ** 1A. 5% arriving without test. Of these 0.5% positive from first + 0.5% of all those entering retest positive. Cases have 10 contacts
 ** 1B. 5% arriving without test. Of these 0.5% positive from first + 0.5% of all those entering retest positive. Cases have 14 contacts
 
-** 2A. 5% arriving without test. Of these 1% positive + 1% of all those entering retest positive. Cases have 10 contacts
-** 2B. 5% arriving without test. Of these 1% positive + 1% of all those entering retest positive. Cases have 14 contacts
+** 2A. 5% arriving without test. Of these 0.75% positive + 0.75% of all those entering retest positive. Cases have 10 contacts
+** 2B. 5% arriving without test. Of these 0.75% positive + 0.75% of all those entering retest positive. Cases have 14 contacts
 
-** 3A. 1% arriving without test. Of these 0.5% positive + 0.5% positive on retest. Cases have 10 contacts
-** 3B. 1% arriving without test. Of these 0.5% positive + 0.5% positive on retest. Cases have 14 contacts
+** 3A. 5% arriving without test. Of these 0.025% positive + 0.025% positive on retest. Cases have 10 contacts
+** 3B. 5% arriving without test. Of these 0.025% positive + 0.025% positive on retest. Cases have 14 contacts
 
-** 4A. 1% arriving without test. Of these 1.0% positive + 1.0% positive on retest. Of these 1.0% positive. Cases have 5 contacts
-** 4B. 1% arriving without test. Of these 1.0% positive + 1.0% positive on retest. Cases have 10 contacts
-
-tabdisp scenario tmonth, cellvar(c) by(contact) 
-
-
-/*format(%9.2f) 
+tabdisp scenario tmonth, cellvar(c) by(contact) format(%9.2f) 

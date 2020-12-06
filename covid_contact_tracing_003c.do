@@ -77,19 +77,14 @@ expand days
 drop arrivals days 
 bysort month : gen day = _n
 gen year = 2020 
-tempfile 2020
-save `2020'  // creates dates for 2021
-drop if month > 6
-replace year=2021
-append using `2020'
 gen fdate = mdy(month, day, year) 
 format fdate %td
-keep if fdate >d(01aug2020)
+keep if fdate >d($S_DATE)
 keep fdate darr 
 rename fdate date 
 order date darr 
 replace darr = 0 if date<d(1aug2020) 
-save "`datapath'/version01\2-working/brb_arrivals", replace 
+save "`datapath'/version01\2-working/brb_arrivals2", replace  
 
 
 ** Draw historical CT data from:
@@ -98,7 +93,7 @@ use "`datapath'/version01\2-working/covid_daily_surveillance_1Aug2020", clear
 keep if iso=="BRB"
 
 ** APPEND FUTURE ARRIVALS (from 01-Aug2020) 
-append using "`datapath'/version01\2-working/brb_arrivals"
+append using "`datapath'/version01\2-working/brb_arrivals2"
 sort date
 
 ** NO ARRIVALS IN COVID LOCKDOWN ERA 
@@ -237,11 +232,11 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(01dec2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(01dec2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(01dec2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(01dec2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(01dec2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(01apr2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(01apr2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(01apr2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(01apr2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(01apr2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -250,15 +245,16 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             bgcolor(white) 
             ysize(5) xsize(14)
             
-            xlab(   
-
+             xlab(   
+                    22006 "1 Apr"
+                    22036 "1 May"
+                    22067 "1 Jun"
+                    22097 "1 Jul"
+                    22128 "1 Aug"
+                    22159 "1 Sep"
+                    22189 "1 Oct"
+                    22220 "1 Nov"
                     22250 "1 Dec"
-                    22281 "1 Jan"
-                    22312 "1 Feb"
-                    22340 "1 Mar"
-                    22371 "1 Apr"
-                    22401 "1 May"
-                    22432 "1 June"
 
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -274,10 +270,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
                 lab(2 "$ctfut1 contacts")
                 lab(3 "Cases")
                 )
-                name(scenario1) 
+                name(scenario1b) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario1_$S_DATE.png", replace width(5000)
+        graph export "`outputpath'/04_TechDocs/scenario1b_$S_DATE.png", replace width(5000)
       
 
 restore
@@ -402,11 +398,11 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(01dec2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(01dec2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(01dec2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(01dec2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(01dec2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(01apr2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(01apr2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(01apr2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(01apr2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(01apr2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -415,20 +411,21 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             bgcolor(white) 
             ysize(5) xsize(14)
             
-            xlab(   
-
+             xlab(   
+                    22006 "1 Apr"
+                    22036 "1 May"
+                    22067 "1 Jun"
+                    22097 "1 Jul"
+                    22128 "1 Aug"
+                    22159 "1 Sep"
+                    22189 "1 Oct"
+                    22220 "1 Nov"
                     22250 "1 Dec"
-                    22281 "1 Jan"
-                    22312 "1 Feb"
-                    22340 "1 Mar"
-                    22371 "1 Apr"
-                    22401 "1 May"
-                    22432 "1 June"
 
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(20)160  
+            ylab(0(20)120  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
@@ -439,11 +436,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
                 lab(2 "$ctfut1 contacts")
                 lab(3 "Cases")
                 )
-                name(scenario2) 
+                name(scenario2b) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario2_$S_DATE.png", replace width(5000)
-      
+        graph export "`outputpath'/04_TechDocs/scenario2b_$S_DATE.png", replace width(5000)
 
 restore
 
@@ -569,11 +565,11 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
     ** GRAPHIC OF CT NEEDS OVER TIME
         #delimit ;
         gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(01dec2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(01dec2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(01dec2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(01dec2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(01dec2020), lc("55 74 131%50") lw(0.4) lp("-"))
+            (bar ctsb_av5 date if iso=="BRB" & date>=d(01apr2020), col("197 176 213"))
+            (bar ctsa_av5 date if iso=="BRB" & date>=d(01apr2020), col("216 222 242"))
+            (bar new_cases date if iso=="BRB" & date>=d(01apr2020), col("222 164 159%50"))
+            (line ctsb_low1 date if iso=="BRB" & date>=d(01apr2020), lc("104 43 134%50") lw(0.4) lp("-"))
+            (line ctsa_low1 date if iso=="BRB" & date>=d(01apr2020), lc("55 74 131%50") lw(0.4) lp("-"))
 
             ,
 
@@ -582,20 +578,21 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             bgcolor(white) 
             ysize(5) xsize(14)
             
-            xlab(   
-
+             xlab(   
+                    22006 "1 Apr"
+                    22036 "1 May"
+                    22067 "1 Jun"
+                    22097 "1 Jul"
+                    22128 "1 Aug"
+                    22159 "1 Sep"
+                    22189 "1 Oct"
+                    22220 "1 Nov"
                     22250 "1 Dec"
-                    22281 "1 Jan"
-                    22312 "1 Feb"
-                    22340 "1 Mar"
-                    22371 "1 Apr"
-                    22401 "1 May"
-                    22432 "1 June"
 
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(5)15  
+            ylab(0(20)120  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
@@ -606,10 +603,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
                 lab(2 "$ctfut1 contacts")
                 lab(3 "Cases")
                 )
-                name(scenario3) 
+                name(scenario3b) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario3_$S_DATE.png", replace width(5000)
+        graph export "`outputpath'/04_TechDocs/scenario3b_$S_DATE.png", replace width(5000)
       
 
 restore

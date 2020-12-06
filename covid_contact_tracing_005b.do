@@ -1,6 +1,6 @@
  **HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name				  covid_contact_tracing_003b.do
+    //  algorithm name				  covid_contact_tracing_005b.do
     //  project:				        
     //  analysts:				  	  Ian HAMBLETON
     //  algorithm task			      Run DO file batch
@@ -23,9 +23,8 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\covid_contact_tracing_003b", replace
+    log using "`logpath'\covid_contact_tracing_005b", replace
 ** HEADER -----------------------------------------------------
-
 
 ** BARBADOS AS EXAMPLE 
 ** COMMON TO ALL SCENARIOS
@@ -116,14 +115,18 @@ global S2_DATE = "05aug2020"
 gen darr_hr = darr_red*0.2 
 
 
+** Save scenario dataset
+tempfile scenario scenario1 scenario2 scenario3 scenario4 scencomb
+save `scenario', replace 
+
+
 ** FUTURE SCENARIO 1
 
 ** Then 95% arriving with negative tests
 ** Of the 5% without negative tests - estimating that 0.5% will test positive on arrival and 0.5% of all arrivals retest positive. 
 ** Of these newly arrived cases we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
 ** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
-
-preserve 
+ 
 ** Arriving with no test (5%) 
 gen darr_notest = darr_red * 0.05  // CHANGE AS NEEDED
 
@@ -166,7 +169,7 @@ global ctint = 4
 global ctnot = 15
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+global ctfup = 40
 
 ** Contact supervision
 global ctsup = 10
@@ -222,65 +225,14 @@ gen cts_totala = cts_int + cts_nota + cts_fupa
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
-by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
-by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
+by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario1a)
+by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario1b)
+
+keep date days new_cases scenario1a scenario1b 
+order date days scenario1a scenario1b new_cases 
+save `scenario1', replace 
 
 
-
-**    keep if iso== "`country'" 
-    local elapsed = maxel + 1
-
-    ** Smoothing: method 2
-    lowess cts_totala date , bwidth(0.2) gen(ctsa_low1) nogr
-    lowess cts_totalb date , bwidth(0.2) gen(ctsb_low1) nogr
-
-    ** GRAPHIC OF CT NEEDS OVER TIME
-        #delimit ;
-        gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(01dec2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(01dec2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(01dec2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(01dec2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(01dec2020), lc("55 74 131%50") lw(0.4) lp("-"))
-
-            ,
-
-            plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            bgcolor(white) 
-            ysize(5) xsize(14)
-            
-            xlab(   
-
-                    22250 "1 Dec"
-                    22281 "1 Jan"
-                    22312 "1 Feb"
-                    22340 "1 Mar"
-                    22371 "1 Apr"
-                    22401 "1 May"
-                    22432 "1 June"
-
-            , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
-            xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
-                
-            ylab(0(20)120  
-            , labs(7) notick nogrid glc(gs16) angle(0))
-            yscale(fill noline) 
-            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
-
-            legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
-                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
-                lab(1 "$ctfut2 contacts")
-                lab(2 "$ctfut1 contacts")
-                lab(3 "Cases")
-                )
-                name(scenario1) 
-                ;
-        #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario1_$S_DATE.png", replace width(5000)
-      
-
-restore
 
 ** FUTURE SCENARIO 2
 
@@ -289,7 +241,8 @@ restore
 ** Of these newly arrived cases we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
 ** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
-preserve
+use `scenario', replace 
+
 ** Arriving with no test (5%) 
 gen darr_notest = darr_red * 0.05
 
@@ -388,64 +341,12 @@ gen cts_totala = cts_int + cts_nota + cts_fupa
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
-by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
-by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
+by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario2a)
+by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario2b)
 
-
-**    keep if iso== "`country'" 
-    local elapsed = maxel + 1
-
-    ** Smoothing: method 2
-    lowess cts_totala date , bwidth(0.2) gen(ctsa_low1) nogr
-    lowess cts_totalb date , bwidth(0.2) gen(ctsb_low1) nogr
-
-    ** GRAPHIC OF CT NEEDS OVER TIME
-        #delimit ;
-        gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(01dec2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(01dec2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(01dec2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(01dec2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(01dec2020), lc("55 74 131%50") lw(0.4) lp("-"))
-
-            ,
-
-            plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            bgcolor(white) 
-            ysize(5) xsize(14)
-            
-            xlab(   
-
-                    22250 "1 Dec"
-                    22281 "1 Jan"
-                    22312 "1 Feb"
-                    22340 "1 Mar"
-                    22371 "1 Apr"
-                    22401 "1 May"
-                    22432 "1 June"
-
-            , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
-            xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
-                
-            ylab(0(20)160  
-            , labs(7) notick nogrid glc(gs16) angle(0))
-            yscale(fill noline) 
-            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
-
-            legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
-                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
-                lab(1 "$ctfut2 contacts")
-                lab(2 "$ctfut1 contacts")
-                lab(3 "Cases")
-                )
-                name(scenario2) 
-                ;
-        #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario2_$S_DATE.png", replace width(5000)
-      
-
-restore
+keep date days scenario2a scenario2b new_cases
+order date days scenario2a scenario2b new_cases
+save `scenario2', replace 
 
 
 ** FUTURE SCENARIO 3
@@ -455,7 +356,8 @@ restore
 ** Of these newly arrived cases we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
 ** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
-preserve 
+use `scenario', replace 
+
 ** Arriving with no test (5%) 
 gen darr_notest = darr_red * 0.05
 
@@ -554,101 +456,58 @@ gen cts_totala = cts_int + cts_nota + cts_fupa
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
-by iso : asrol cts_totala , stat(mean) window(date 5) gen(ctsa_av5)
-by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
+by iso : asrol cts_totala , stat(mean) window(date 5) gen(scenario3a)
+by iso : asrol cts_totalb , stat(mean) window(date 5) gen(scenario3b)
+
+keep date days scenario3a scenario3b new_cases
+order date days scenario3a scenario3b new_cases
+save `scenario3', replace 
 
 
 
-**    keep if iso== "`country'" 
-    local elapsed = maxel + 1
+use `scenario1', clear 
+merge 1:1 date using `scenario2'
+drop _merge 
+merge 1:1 date using `scenario3'
+drop _merge 
+save `scencomb', replace
 
-    ** Smoothing: method 2
-    lowess cts_totala date , bwidth(0.2) gen(ctsa_low1) nogr
-    lowess cts_totalb date , bwidth(0.2) gen(ctsb_low1) nogr
+** TABLE
+***The absolute difference (a simple substraction) may actualy be the most appropriate measure
+***Since we are trying to inform resource development/estimation.
 
-    ** GRAPHIC OF CT NEEDS OVER TIME
-        #delimit ;
-        gr twoway 
-            (bar ctsb_av5 date if iso=="BRB" & date>=d(01dec2020), col("197 176 213"))
-            (bar ctsa_av5 date if iso=="BRB" & date>=d(01dec2020), col("216 222 242"))
-            (bar new_cases date if iso=="BRB" & date>=d(01dec2020), col("222 164 159%50"))
-            (line ctsb_low1 date if iso=="BRB" & date>=d(01dec2020), lc("104 43 134%50") lw(0.4) lp("-"))
-            (line ctsa_low1 date if iso=="BRB" & date>=d(01dec2020), lc("55 74 131%50") lw(0.4) lp("-"))
-
-            ,
-
-            plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            bgcolor(white) 
-            ysize(5) xsize(14)
-            
-            xlab(   
-
-                    22250 "1 Dec"
-                    22281 "1 Jan"
-                    22312 "1 Feb"
-                    22340 "1 Mar"
-                    22371 "1 Apr"
-                    22401 "1 May"
-                    22432 "1 June"
-
-            , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
-            xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
-                
-            ylab(0(5)15  
-            , labs(7) notick nogrid glc(gs16) angle(0))
-            yscale(fill noline) 
-            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
-
-            legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
-                region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
-                lab(1 "$ctfut2 contacts")
-                lab(2 "$ctfut1 contacts")
-                lab(3 "Cases")
-                )
-                name(scenario3) 
-                ;
-        #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario3_$S_DATE.png", replace width(5000)
-      
-
-restore
+** Monthly averages
+gen year = year(date)
+gen month = month(date)
+gen tmonth = ym(year, month)
+keep if tmonth>726
+label define tmonth 727 "Aug 2020" 728 "Sep 2020" 729 "Oct 2020" 730 "Nov 2020" 731 "Dec 2020" 732 "Jan 2021" 733 "Feb 2021" 734 "Mar 2021" 735 "Apr 2021" 736 "May 2021" 737 "Jun 2021"
+label values tmonth tmonth
 
 
-** ------------------------------------------------------
-** PDF REGIONAL REPORT (COUNTS OF CONFIRMED CASES)
-** ------------------------------------------------------
-    putpdf begin, pagesize(letter) font("Calibri Light", 10) margin(top,0.5cm) margin(bottom,0.25cm) margin(left,0.5cm) margin(right,0.25cm)
 
-** EXTRA SLIDE - ALL CT CURVES ON ONE SLIDES
-    **putpdf table intro2 = (1,1), width(100%) halign(left)    
-    **putpdf table intro2(.,.), border(all, nil) valign(center)
-    **putpdf table intro2(1,.), font("Calibri Light", 12, 000000)  
-    **putpdf table intro2(1,1)=("Figure 1: "), bold halign(left)
-    **putpdf table intro2(1,1)=("Estimations of Contact Tracing Workforce Needs, given 4 possible scenarios for SARS-COV2 prevalence ") , halign(left) append 
-    **putpdf table intro2(1,1)=("and PCR status (positive/negative)"), halign(left) append   
+collapse (mean) scenario1a scenario1b scenario2a scenario2b scenario3a scenario3b, by(tmonth)
+/*rename scenario1a a1
+rename scenario1b b1
+rename scenario2a a2
+rename scenario2b b2
+rename scenario3a a3
+rename scenario3b b3
+rename scenario4a a4
+rename scenario4b b4
+reshape long a b, i(tmonth) j(scenario)
+rename a c8
+rename b c12 
+reshape long c, i(tmonth scenario) j(contacts)
 
-** FIGURE 
-    putpdf table f2 = (8,1), width(70%) border(all,nil) halign(center)
-    putpdf table f2(1,1)=("Scenario 1. 5% without test, 0.5% of those test positive on first test and 0.5% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
-    putpdf table f2(2,1)=image("`outputpath'/04_TechDocs/scenario1_$S_DATE.png")
-    putpdf table f2(4,1)=("Scenario 2. 5% without test, 0.75% of those test positive on first test and 0.75% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
-    putpdf table f2(5,1)=image("`outputpath'/04_TechDocs/scenario2_$S_DATE.png")
-    putpdf table f2(7,1)=("Scenario 3. 5% without test, 0.025% of those test positive on first test and 0.025% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
-    putpdf table f2(8,1)=image("`outputpath'/04_TechDocs/scenario3_$S_DATE.png")
-    **putpdf table f2(7,1)=("Scenario 4. 1% without test, 1% of those test positive on first test and 1% on retest, 10 contacts (blue), 14 contacts (purple)"), halign(left) font("Calibri Light", 9, 0e497c)  
-    **putpdf table f2(8,1)=image("`outputpath'/04_TechDocs/scenario4_$S_DATE.png")
+** THE SCENARIOS
+** 1A. 5% arriving without test. Of these 0.5% positive from first + 0.5% of all those entering retest positive. Cases have 10 contacts
+** 1B. 5% arriving without test. Of these 0.5% positive from first + 0.5% of all those entering retest positive. Cases have 14 contacts
 
-** Footnote.
-    **putpdf paragraph ,  font("Calibri Light", 9)
-    **putpdf text ("Methodological Note 1. ") , bold
-    **putpdf text ("Each graphic presents the daily demand for contact tracers given the confirmed COVID-19 caseload. The demand assumes that contact tracers can ")
-    **putpdf text ("conduct 6 confirmed case interviews, 12 potential case notifications, and 32 potential case follow-ups. Case follow-up is required for up to ") 
-    **putpdf text ("14 days after identification. ")
-    **putpdf text ("Methodological Note 2. ") , bold
-    **putpdf text ("Blue bars assume 10 contacts per confirmed case. Purple bars assume 15 contacts per confirmed case. Dotted lines are smoothed daily contact tracer demand. ")
+** 2A. 5% arriving without test. Of these 0.75% positive + 0.75% of all those entering retest positive. Cases have 10 contacts
+** 2B. 5% arriving without test. Of these 0.75% positive + 0.75% of all those entering retest positive. Cases have 14 contacts
 
-** Save the PDF
-    local c_date = c(current_date)
-    local date_string = subinstr("`c_date'", " ", "", .)
-    putpdf save "`outputpath'/05_Outputs/brb_scenarios_`date_string'", replace
+** 3A. 5% arriving without test. Of these 0.025% positive + 0.025% positive on retest. Cases have 10 contacts
+** 3B. 5% arriving without test. Of these 0.025% positive + 0.025% positive on retest. Cases have 14 contacts
+
+tabdisp scenario tmonth, cellvar(c) by(contact) format(%9.2f) 
