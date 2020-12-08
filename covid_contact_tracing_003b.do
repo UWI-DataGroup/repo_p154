@@ -104,8 +104,8 @@ sort date
 ** NO ARRIVALS IN COVID LOCKDOWN ERA 
 replace darr = 0 if darr==. 
 
-** Reduction of 59% arrivals from Aug 2020 CHANGE AS NEEDED BASED ON ARRIVAL REDUCTIONS
-gen darr_red = darr * 0.41 if date>=d(01aug2020) 
+** Reduction of 85% arrivals from Aug 2020 CHANGE AS NEEDED BASED ON ARRIVAL REDUCTIONS
+gen darr_red = darr * 0.15 if date>=d(01aug2020) 
 
 ***A Macro to separate time to August 1 and after August 5
 global S1_DATE = "01aug2020"
@@ -131,8 +131,8 @@ gen darr_notest = darr_red * 0.05  // CHANGE AS NEEDED
 ** 0.5% without a test will be positive, plus 0.5% of ALL ARRIVALS 
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.005) + (darr * 0.005)) if random>=0.5 // CHANGE AS NEEDED
-replace darr_pos = floor((darr_notest * 0.005) + (darr * 0.005)) if random<0.5 // CHANGE AS NEEDED 
+gen darr_pos = ceil((darr_notest * 0.005) + (darr_red * 0.005)) if random>=0.5 // CHANGE AS NEEDED
+replace darr_pos = floor((darr_notest * 0.005) + (darr_red * 0.005)) if random<0.5 // CHANGE AS NEEDED 
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -263,7 +263,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(20)120  
+            ylab(0(5)25  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
@@ -297,8 +297,8 @@ gen darr_notest = darr_red * 0.05
 ** 0.75% without a test will be positive and 75% of all arrivals will be positive
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.0075) + (darr * 0.0075))  if random>=0.5
-replace darr_pos = floor((darr_notest * 0.0075) + (darr * 0.0075)) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.0075) + (darr_red * 0.0075))  if random>=0.5
+replace darr_pos = floor((darr_notest * 0.0075) + (darr_red * 0.0075)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -428,7 +428,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(20)160  
+            ylab(0(5)25  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
@@ -463,8 +463,8 @@ gen darr_notest = darr_red * 0.05
 ** 0.00025% without a test will be positive, plus 0.00025% of ALL ARRIVALS
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.00025) + (darr * 0.00025)) if random>=0.5
-replace darr_pos = floor((darr_notest * 0.00025) + (darr * 0.00025)) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.00025) + (darr_red * 0.00025)) if random>=0.5
+replace darr_pos = floor((darr_notest * 0.00025) + (darr_red * 0.00025)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -595,7 +595,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(5)15  
+            ylab(0(5)25  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 

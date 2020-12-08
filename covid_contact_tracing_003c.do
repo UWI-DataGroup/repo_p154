@@ -217,7 +217,7 @@ replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
+gen cts_fuhrb = new_cases/($ctfup) if date >= d($S2_DATE)
 replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
@@ -273,7 +273,7 @@ bysort iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(5)20  
+            ylab(0(20)120  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
@@ -284,12 +284,11 @@ bysort iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
                 lab(7 "$ctfut1 contacts")
                 lab(8 "Cases")
 
-                
-                name(scenario1b) 
+                       )
+                name(scenario_real) 
                 ;
         #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario1b_$S_DATE.png", replace width(5000)
+        graph export "`outputpath'/04_TechDocs/scenario_real_$S_DATE.png", replace width(5000)
       
 
-restore
 
