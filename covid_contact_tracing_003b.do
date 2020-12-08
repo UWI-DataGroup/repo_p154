@@ -30,7 +30,7 @@
 ** BARBADOS AS EXAMPLE 
 ** COMMON TO ALL SCENARIOS
 ** 59% reduction in tourism arrivals per country 
-** we estimate 8 to 12 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
+** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
 
 ** TEMP tourism data for Barbados
 input year month days arrivals
@@ -111,9 +111,9 @@ gen darr_red = darr * 0.15 if date>=d(01aug2020)
 global S1_DATE = "01aug2020"
 global S2_DATE = "05aug2020"
 
-***Calculating numbers of high risk cases arrivals assuming 20%
+***Calculating numbers of high risk cases arrivals
 **This contributes to cases that need mandatory following
-gen darr_hr = darr_red*0.2 
+gen darr_hr = darr_red*0.8 
 
 
 ** FUTURE SCENARIO 1
@@ -163,10 +163,10 @@ global ctfut2 = 14
 global ctint = 4
 
 ** Daily case load: Contact notification
-global ctnot = 15
+global ctnot = 12
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+global ctfup = 20
 
 ** Contact supervision
 global ctsup = 10
@@ -184,7 +184,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel darr_hr
+keep country country_order iso iso_num pop date new_cases days maxel darr_red
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -214,11 +214,14 @@ replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
+gen cts_fuhra = darr_red/($ctfup) if date <  d($S1_DATE)
+gen cts_fuhrb = darr_red/($ctfup) if date >= d($S2_DATE)
+replace cts_fuhra = 0 if cts_fuhrb == .
 replace cts_fuhrb = 0 if cts_fuhrb == .
+tab cts_fuhrb
 
 ** Total CT staffing needed per week 
-gen cts_totala = cts_int + cts_nota + cts_fupa 
+gen cts_totala = cts_int + cts_nota + cts_fupa
 gen cts_totalb = cts_int + cts_notb + cts_fupb + cts_fuhrb
 
 ** Smoothing: method 1
@@ -263,10 +266,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(5)25  
+            ylab(0(10)60  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("Frequency", size(6) margin(l=2 r=2 t=2 b=2)) 
 
             legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
@@ -329,10 +332,10 @@ global ctfut2 = 14
 global ctint = 4
 
 ** Daily case load: Contact notification
-global ctnot = 15
+global ctnot = 12
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+global ctfup = 20
 
 ** Contact supervision
 global ctsup = 10
@@ -428,10 +431,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(5)25  
+            ylab(0(10)60  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("Frequency", size(6) margin(l=2 r=2 t=2 b=2)) 
 
             legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
@@ -495,10 +498,10 @@ global ctfut2 = 14
 global ctint = 4
 
 ** Daily case load: Contact notification
-global ctnot = 15
+global ctnot = 12
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+global ctfup = 20
 
 ** Contact supervision
 global ctsup = 10
@@ -595,10 +598,10 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(5)25  
+            ylab(0(10)60  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("Number of contact tracers", size(6) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("Frequency", size(6) margin(l=2 r=2 t=2 b=2)) 
 
             legend(size(3) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
