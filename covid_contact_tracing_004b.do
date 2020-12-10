@@ -3,7 +3,7 @@
     //  algorithm name				  covid_contact_tracing_004b.do
     //  project:				        
     //  analysts:				  	  Ian HAMBLETON
-    //  algorithm task			      Run DO file batch
+    //  algorithm task			      This do file recreates the scenarios in do file 3b, but formats the data for tabulation
 
     ** General algorithm set-up
     version 16
@@ -103,8 +103,8 @@ sort date
 ** NO ARRIVALS IN COVID LOCKDOWN ERA 
 replace darr = 0 if darr==. 
 
-** Reduction of 59% arrivals from Aug 2020 CHANGE AS NEEDED BASED ON ARRIVAL REDUCTIONS
-gen darr_red = darr * 0.41 if date>=d(01aug2020) 
+** Reduction of 85% arrivals from Aug 2020 CHANGE AS NEEDED BASED ON ARRIVAL REDUCTIONS
+gen darr_red = darr * 0.15 if date>=d(01aug2020) 
 
 ***A Macro to separate time to August 1 and after August 5
 global S1_DATE = "01aug2020"
@@ -134,8 +134,8 @@ gen darr_notest = darr_red * 0.05  // CHANGE AS NEEDED
 ** 0.5% without a test will be positive, plus 0.5% of ALL ARRIVALS 
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.005) + (darr * 0.005)) if random>=0.5 // CHANGE AS NEEDED
-replace darr_pos = floor((darr_notest * 0.005) + (darr * 0.005)) if random<0.5 // CHANGE AS NEEDED 
+gen darr_pos = ceil((darr_notest * 0.005) + (darr_red * 0.005)) if random>=0.5 // CHANGE AS NEEDED
+replace darr_pos = floor((darr_notest * 0.005) + (darr_red * 0.005)) if random<0.5 // CHANGE AS NEEDED 
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -168,11 +168,11 @@ global ctfut3 = 12
 global ctint = 4
 
 ** Daily case load: Contact notification
-global ctnot = 15
+global ctnot = 12
 
 ** Daily case load: Contact follow-up 
 *global ctfup = 30
-global ctfup = 40
+global ctfup = 20
 
 
 ** Contact supervision
@@ -265,8 +265,8 @@ gen darr_notest = darr_red * 0.05
 ** 0.75% without a test will be positive and 75% of all arrivals will be positive
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.0075) + (darr * 0.0075))  if random>=0.5
-replace darr_pos = floor((darr_notest * 0.0075) + (darr * 0.0075)) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.0075) + (darr_red * 0.0075))  if random>=0.5
+replace darr_pos = floor((darr_notest * 0.0075) + (darr_red * 0.0075)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -299,11 +299,11 @@ global ctfut3 = 12
 global ctint = 4
 
 ** Daily case load: Contact notification
-global ctnot = 15
+global ctnot = 12
 
 ** Daily case load: Contact follow-up 
 *global ctfup = 30
-global ctfup = 40
+global ctfup = 20
 
 
 ** Contact supervision
@@ -394,8 +394,8 @@ gen darr_notest = darr_red * 0.05
 ** 0.00025% without a test will be positive, plus 0.00025% of ALL ARRIVALS
 ** With RANDOM round-down or round-up to nearest integer 
 gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.00025) + (darr * 0.00025)) if random>=0.5
-replace darr_pos = floor((darr_notest * 0.00025) + (darr * 0.00025)) if random<0.5
+gen darr_pos = ceil((darr_notest * 0.00025) + (darr_red * 0.00025)) if random>=0.5
+replace darr_pos = floor((darr_notest * 0.00025) + (darr_red * 0.00025)) if random<0.5
 drop random 
 
 ** Now calculate the same NUMBERS as for historical data 
@@ -429,11 +429,11 @@ global ctfut3 = 12
 global ctint = 4
 
 ** Daily case load: Contact notification
-global ctnot = 15
+global ctnot = 12
 
 ** Daily case load: Contact follow-up 
 *global ctfup = 30
-global ctfup = 40
+global ctfup = 20
 
 
 ** Contact supervision

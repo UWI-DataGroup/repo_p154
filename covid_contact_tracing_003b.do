@@ -3,7 +3,8 @@
     //  algorithm name				  covid_contact_tracing_003b.do
     //  project:				        
     //  analysts:				  	  Ian HAMBLETON
-    //  algorithm task			      Run DO file batch
+    //  algorithm task			      This do file creates the graphics required for the CT paper, which have been updated in Dec 2020
+    //                                from covid_contact_tracing_003 in response comments from peer review
 
     ** General algorithm set-up
     version 16
@@ -598,7 +599,7 @@ by iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(10)60  
+            ylab(0(5)30  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("Frequency", size(6) margin(l=2 r=2 t=2 b=2)) 

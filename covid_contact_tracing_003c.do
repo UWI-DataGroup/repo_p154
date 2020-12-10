@@ -1,9 +1,9 @@
  **HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name				  covid_contact_tracing_003b.do
+    //  algorithm name				  covid_contact_tracing_003c.do
     //  project:				        
     //  analysts:				  	  Ian HAMBLETON
-    //  algorithm task			      Run DO file batch
+    //  algorithm task			      This do file utilises actual number of cases between April and November to validate model
 
     ** General algorithm set-up
     version 16
@@ -113,30 +113,7 @@ global S2_DATE = "05aug2020"
 gen darr_hr = darr_red*0.2 
 
 
-** FUTURE SCENARIO 1
-
-** Then 95% arriving with negative tests
-** Of the 5% without negative tests - estimating that 0.5% will test positive on arrival and 0.5% of all arrivals retest positive. 
-** Of these newly arrived cases we assume quarantine measures in place between arrival and confirmation of diagnosis for those without tests 
-** we estimate 10 to 14 contacts- airport officials, taxi, hotel officials and aircraft seating arrangements
-
-*preserve 
-*/* Arriving with no test (5%) 
-gen darr_notest = darr_red * 0.05  // CHANGE AS NEEDED
-
-
-** 0.5% without a test will be positive, plus 0.5% of ALL ARRIVALS 
-** With RANDOM round-down or round-up to nearest integer 
-gen random = uniform() if date>=d(01aug2020)
-gen darr_pos = ceil((darr_notest * 0.005) + (darr * 0.005)) if random>=0.5 // CHANGE AS NEEDED
-replace darr_pos = floor((darr_notest * 0.005) + (darr * 0.005)) if random<0.5 // CHANGE AS NEEDED 
-drop random 
-
-** Now calculate the same NUMBERS as for historical data 
-replace new_cases = darr_pos if date>=d(01aug2020) & date<=d(30dec2020) 
-replace darr_red = 0 if darr_red==.
-replace darr_notest = 0 if darr_notest==.
-replace darr_pos = 0 if darr_pos==. */
+**Tidy up dataset
 replace country="Barbados" if country=="" 
 replace iso="BRB" if iso=="" 
 replace country_order = 4 if country_order==. 
@@ -160,10 +137,10 @@ global ctfut2 = 14
 global ctint = 4
 
 ** Daily case load: Contact notification
-global ctnot = 15
+global ctnot = 12
 
 ** Daily case load: Contact follow-up 
-global ctfup = 30
+global ctfup = 20
 
 ** Contact supervision
 global ctsup = 10
@@ -276,7 +253,7 @@ bysort iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             ylab(0(20)120  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
-            ytitle("CT resources", size(7) margin(l=2 r=2 t=2 b=2)) 
+            ytitle("Frequency", size(7) margin(l=2 r=2 t=2 b=2)) 
 
                        legend(size(5) position(1) ring(0) bm(t=1 b=1 l=1 r=1) colf cols(1) lc(gs16)
                 region(fcolor(gs16) lw(vthin) margin(l=2 r=2 t=2 b=2) lc(gs16)) order(8 7 6)
