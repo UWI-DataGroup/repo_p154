@@ -101,16 +101,12 @@ sort date
 ** NO ARRIVALS IN COVID LOCKDOWN ERA 
 replace darr = 0 if darr==. 
 
-** Reduction of 59% arrivals from Aug 2020 CHANGE AS NEEDED BASED ON ARRIVAL REDUCTIONS
-gen darr_red = darr * 0.41 if date>=d(01aug2020) 
+** Reduction of 85% arrivals from Aug 2020 CHANGE AS NEEDED BASED ON ARRIVAL REDUCTIONS
+gen darr_red = darr * 0.15 if date>=d(01aug2020) 
 
 ***A Macro to separate time to August 1 and after August 5
 global S1_DATE = "01aug2020"
 global S2_DATE = "05aug2020"
-
-***Calculating numbers of high risk cases arrivals assuming 20%
-**This contributes to cases that need mandatory following
-gen darr_hr = darr_red*0.2 
 
 
 **Tidy up dataset
@@ -157,8 +153,8 @@ bysort iso : egen maxel = max(elapsed)
 ** (B) Calculate the CT needs based on confirmed case identification
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
-drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel darr_hr
+drop elapse
+keep country country_order iso iso_num pop date new_cases days maxel darr_red
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -194,8 +190,11 @@ replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = new_cases/($ctfup) if date >= d($S2_DATE)
+gen cts_fuhra = darr_red/($ctfup) if date <  d($S1_DATE)
+gen cts_fuhrb = darr_red/($ctfup) if date >= d($S2_DATE)
+replace cts_fuhra = 0 if cts_fuhrb == .
 replace cts_fuhrb = 0 if cts_fuhrb == .
+tab cts_fuhrb
 
 ** Total CT staffing needed per week 
 gen cts_totala = cts_int + cts_nota + cts_fupa 
@@ -250,7 +249,7 @@ bysort iso : asrol cts_totalb , stat(mean) window(date 5) gen(ctsb_av5)
             , labs(7) nogrid glc(gs16) angle(0) format(%9.0f))
             xtitle("", size(7) margin(l=2 r=2 t=2 b=2)) 
                 
-            ylab(0(20)120  
+            ylab(0(5)40  
             , labs(7) notick nogrid glc(gs16) angle(0))
             yscale(fill noline) 
             ytitle("Frequency", size(7) margin(l=2 r=2 t=2 b=2)) 
