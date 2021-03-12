@@ -114,7 +114,7 @@ global S2_DATE = "05aug2020"
 
 ***Calculating numbers of high risk cases arrivals
 **This contributes to cases that need mandatory following
-gen darr_hr = darr_red*0.8 
+*gen darr_hr = darr_red*0.8 
 
 
 ** FUTURE SCENARIO 1
@@ -354,7 +354,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel darr_hr
+keep country country_order iso iso_num pop date new_cases days maxel darr_red 
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -384,7 +384,7 @@ replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
+gen cts_fuhrb = darr_red/($ctfup) if date >= d($S2_DATE)
 replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
@@ -520,7 +520,7 @@ bysort iso : egen maxel = max(elapsed)
 ** keep if iso=="`country'" 
 gen days = elapsed+1 
 drop elapsed 
-keep country country_order iso iso_num pop date new_cases days maxel darr_hr
+keep country country_order iso iso_num pop date new_cases days maxel darr_red
 bysort iso : gen runid = _n 
 gen ccase = 0
 
@@ -550,7 +550,7 @@ replace cts_fupa = (case14 * $ctfut1) / ($ctfup) if date >= d($S2_DATE)
 replace cts_fupb = (case14 * $ctfut2) / ($ctfup) if date >= d($S2_DATE)
 
 ***Running total of CT-staff for mandatory quarantine follow-up
-gen cts_fuhrb = darr_hr/($ctfup) if date >= d($S2_DATE)
+gen cts_fuhrb = darr_red/($ctfup) if date >= d($S2_DATE)
 replace cts_fuhrb = 0 if cts_fuhrb == .
 
 ** Total CT staffing needed per week 
