@@ -86,8 +86,8 @@ order date darr
 replace darr = 0 if date<d(1apr2021) 
 save "`datapath'/version01\2-working/brb_arrivals", replace 
 
-** Reduction of 90% arrivals 
-gen darr_red = darr * 0.1
+** Reduction of 50% arrivals 
+gen darr_red = darr * 0.25
 
 ** FUTURE SCENARIO 1
 
@@ -97,130 +97,12 @@ gen darr_red = darr * 0.1
 
 *preserve 
 
-/** 0.2 % of arrivals test postive at 5 days
-** With RANDOM round-down or round-up to nearest integer 
-gen random = uniform() 
-gen new_cases = ceil((darr_red * 0.002)) if random>=0.5 // CHANGE AS NEEDED
-replace new_cases = floor((darr_red * 0.002)) if random<0.5 // CHANGE AS NEEDED 
-drop random 
-*/
+gen new_cases1 = (darr_red * 0.0000575)
 
-gen new_cases = (darr_red * 0.002)
+gen new_cases2 = (darr_red * 0.00014375)
 
-gen new_cases2 = (darr_red * 0.0075)
+gen new_cases3 = (darr_red * 0.001846163)
 
-gen new_cases3 = (darr_red * 0.00025)
+gen month = month(date)
 
-    /** GRAPHIC OF CT NEEDS OVER TIME
-        #delimit ;
-        gr twoway 
-            (bar new_cases date, col("222 164 159%50"))
-            ,
-
-            plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            bgcolor(white) 
-            ysize(5) xsize(14)
-            
-
-                
-            ylab(0(1)5  
-            , labs(7) notick nogrid glc(gs16) angle(0))
-            yscale(fill noline) 
-            ytitle("Frequency", size(6) margin(l=2 r=2 t=2 b=2)) 
-
-                name(scenario1) 
-                ;
-        #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario1_$S_DATE.png", replace width(5000)
-      
-
-*restore
-
-/* FUTURE SCENARIO 2 (worst case)
-
-** Everyone has a test before boarding the plane
-** At retest 5 days after arrival, 0.75% test positive 
-** Of these newly arrived cases, we assume they will move freely for 5 days and to estimate cases arising, the SIR model applies
-
-*preserve 
-
-** 0.75 % of arrivals test postive at 5 days
-** With RANDOM round-down or round-up to nearest integer 
-gen random = uniform() 
-gen new_cases = ceil((darr_red * 0.0075)) if random>=0.5 // CHANGE AS NEEDED
-replace new_cases = floor((darr_red * 0.0075)) if random<0.5 // CHANGE AS NEEDED 
-drop random 
-
-
-    ** GRAPHIC OF CT NEEDS OVER TIME
-        #delimit ;
-        gr twoway 
-            (bar new_cases date, col("222 164 159%50"))
-            ,
-
-            plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            bgcolor(white) 
-            ysize(5) xsize(14)
-            
-
-                
-            ylab(0(1)5  
-            , labs(7) notick nogrid glc(gs16) angle(0))
-            yscale(fill noline) 
-            ytitle("Frequency", size(6) margin(l=2 r=2 t=2 b=2)) 
-
-                name(scenario2) 
-                ;
-        #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario2_$S_DATE.png", replace width(5000)
-      
-
-*restore
-
-
-** FUTURE SCENARIO 3 (best case)
-
-** Everyone has a test before boarding the plane
-** At retest 5 days after arrival, 0.00025% test positive 
-** Of these newly arrived cases, we assume they will move freely for 5 days and to estimate cases arising, the SIR model applies
-
-*preserve 
-
-** 0.00025 % of arrivals test postive at 5 days
-** With RANDOM round-down or round-up to nearest integer 
-gen random = uniform() 
-gen new_cases = ceil((darr_red * 0.000025)) if random>=0.5 // CHANGE AS NEEDED
-replace new_cases = floor((darr_red * 0.000025)) if random<0.5 // CHANGE AS NEEDED 
-drop random 
-
-gen new_cases = darr_red * 0.00025
-
-    ** GRAPHIC OF CT NEEDS OVER TIME
-        #delimit ;
-        gr twoway 
-            (bar new_cases date, col("222 164 159%50"))
-            ,
-
-            plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
-            bgcolor(white) 
-            ysize(5) xsize(14)
-            
-
-                
-            ylab(0(1)5  
-            , labs(7) notick nogrid glc(gs16) angle(0))
-            yscale(fill noline) 
-            ytitle("Frequency", size(6) margin(l=2 r=2 t=2 b=2)) 
-
-                name(scenario3) 
-                ;
-        #delimit cr
-        graph export "`outputpath'/04_TechDocs/scenario3_$S_DATE.png", replace width(5000)
-      
-
-*restore
-
-
+collapse (sum) new_cases1 new_cases2 new_cases3, by (month)      
